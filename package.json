@@ -29,7 +29,8 @@
   "files": [
     "android/",
     "ios/",
-    "index.js"
+    "src/",
+    "lib/"
   ],
   "license": "MIT",
   "peerDependencies": {
