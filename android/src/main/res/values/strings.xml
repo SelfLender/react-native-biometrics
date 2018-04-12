@@ -1,0 +1,7 @@
+<resources>
+    <string name="fingerprint_cancel">Cancel</string>
+    <string name="fingerprint_message">Confirm fingerprint to continue</string>
+    <string name="fingerprint_hint">Touch sensor</string>
+    <string name="fingerprint_recognized">Fingerprint recognized</string>
+    <string name="fingerprint_not_recognized">Fingerprint not recognized. Try again</string>
+</resources>

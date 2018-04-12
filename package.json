@@ -1,0 +1,37 @@
+{
+  "name": "react-native-biometrics",
+  "version": "1.0.0",
+  "description": "React Native biometric functionality for signing and encryption",
+  "main": "index.js",
+  "keywords": [
+    "react-native",
+    "android",
+    "ios",
+    "biometrics",
+    "authentication",
+    "auth",
+    "fingerprint",
+    "touch-id",
+    "face-id"
+  ],
+  "homepage": "https://github.com/SelfLender/react-native-biometrics",
+  "contributors": [],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SelfLender/react-native-biometrics.git"
+  },
+  "private": false,
+  "author": "Brandon Hines",
+  "files": [
+    "android/",
+    "ios/",
+    "index.js"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "react-native": "^0.41.2"
+  },
+  "bugs": {
+    "url": "https://github.com/SelfLender/react-native-biometrics/issues"
+  }
+}
