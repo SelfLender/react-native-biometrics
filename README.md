@@ -137,7 +137,7 @@ import Biometrics from 'react-native-biometrics'
 let epochTimeSeconds = Math.round((new Date()).getTime() / 1000).toString()
 let payload = epochTimeSeconds + 'some message'
 
-Biometrics.createKeys('Sign in', payload)
+Biometrics.createSignature('Sign in', payload)
   .then((signature) => {
     console.log(signature)
     verifySignatureWithServer(signature, payload)
