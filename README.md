@@ -36,9 +36,19 @@ React native biometrics is a simple bridge to native iOS and Android keystore ma
       compile project(':react-native-biometrics')
   	```
 
-## Special configuration
+## Additional configuration
+
+#### iOS
+
+This package requires an iOS target SDK verion of iOS 10 or higher
 
 Ensure that you have the `NSFaceIDUsageDescription` entry set in your react native iOS project, or Face ID will not work properly.  This description will be will be presented to the user the first time a biometrics action is taken, and the user will be asked if they want to allow the app to use Face ID.  If the user declines the usage of face id for the app, the `isSensorAvailable` function will return `null` until the face id permission is specifically allowed for the app by the user.
+
+NOTE: No biometric prompt is displayed in iOS simulators when attempting to retrieve keys for signature generation, it only occurs on actual devices.
+
+#### Android
+
+This package requires a compiled SDK version of 23 (Android 6.0 Marshmallow) or higher
 
 ## Usage
 
@@ -117,7 +127,7 @@ Prompts the user for their fingerprint or face id in order to retrieve the priva
 __Arguments__
 
 - `promptMessage` - string that will be displayed in the fingerprint or face id prompt
-- `payload` - string of data to signed by the RSA signature
+- `payload` - string of data to be signed by the RSA signature
 
 __Example__
 
