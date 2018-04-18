@@ -73,7 +73,7 @@ Biometrics.isSensorAvailable()
   .then((biometryType) => {
     if (biometryType === 'TouchID') {
       console.log('TouchID is supported')
-    } else if (biometryType === 'FaceId') {
+    } else if (biometryType === 'FaceID') {
       console.log('FaceID is supported')
     } else {
       console.log('Biometrics not supported')
