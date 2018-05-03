@@ -56,7 +56,7 @@ public class ReactNativeBiometricsDialog extends DialogFragment implements React
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dismiss();
+                dismissAllowingStateLoss();
             }
         });
 
@@ -90,7 +90,7 @@ public class ReactNativeBiometricsDialog extends DialogFragment implements React
 
     @Override
     public void onAuthenticated(FingerprintManager.CryptoObject cryptoObject) {
-        dismiss();
+        dismissAllowingStateLoss();
         biometricAuthCallback.onAuthenticated(cryptoObject);
     }
 
@@ -101,7 +101,7 @@ public class ReactNativeBiometricsDialog extends DialogFragment implements React
 
     @Override
     public void onError() {
-        dismiss();
+        dismissAllowingStateLoss();
         biometricAuthCallback.onError();
     }
 }
