@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -57,6 +58,7 @@ public class ReactNativeBiometricsDialog extends DialogFragment implements React
             @Override
             public void onClick(View view) {
                 dismissAllowingStateLoss();
+                onCancel();
             }
         });
 
@@ -70,6 +72,7 @@ public class ReactNativeBiometricsDialog extends DialogFragment implements React
         return view;
     }
 
+    // DialogFragment lifecycle methods
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -88,6 +91,13 @@ public class ReactNativeBiometricsDialog extends DialogFragment implements React
         biometricAuthenticationHelper.startListening(cryptoObject);
     }
 
+    @Override
+    public void onCancel(DialogInterface dialog) {
+        super.onCancel(dialog);
+        onCancel();
+    }
+
+    // ReactNativeBiometricsCallback methods
     @Override
     public void onAuthenticated(FingerprintManager.CryptoObject cryptoObject) {
         dismissAllowingStateLoss();

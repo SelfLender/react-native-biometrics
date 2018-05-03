@@ -25,7 +25,6 @@ public class ReactNativeBiometricsHelper extends FingerprintManager.Authenticati
     private CancellationSignal cancellationSignal;
 
     private boolean selfCancelled;
-    private boolean currentlyListening;
 
     ReactNativeBiometricsHelper(FingerprintManager fingerprintManager, ImageView icon,
                                   TextView errorTextView, ReactNativeBiometricsCallback callback) {
@@ -37,7 +36,6 @@ public class ReactNativeBiometricsHelper extends FingerprintManager.Authenticati
 
     public void startListening(FingerprintManager.CryptoObject cryptoObject) {
         selfCancelled = false;
-        currentlyListening = true;
 
         cancellationSignal = new CancellationSignal();
         fingerprintManager
@@ -51,15 +49,10 @@ public class ReactNativeBiometricsHelper extends FingerprintManager.Authenticati
             cancellationSignal.cancel();
             cancellationSignal = null;
         }
-        if (currentlyListening) {
-            currentlyListening = false;
-            callback.onCancel();
-        }
     }
 
     @Override
     public void onAuthenticationError(int errMsgId, CharSequence errString) {
-        currentlyListening = false;
         if (!selfCancelled) {
             showError(errString);
             icon.postDelayed(new Runnable() {
@@ -83,7 +76,6 @@ public class ReactNativeBiometricsHelper extends FingerprintManager.Authenticati
 
     @Override
     public void onAuthenticationSucceeded(final FingerprintManager.AuthenticationResult result) {
-        currentlyListening = false;
         errorTextView.removeCallbacks(resetErrorTextRunnable);
         icon.setImageResource(R.drawable.ic_fingerprint_success);
         errorTextView.setTextColor(errorTextView.getResources().getColor(R.color.success_color, null));
