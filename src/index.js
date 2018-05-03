@@ -5,6 +5,14 @@ const { ReactNativeBiometrics } = NativeModules
 
 export default {
   /**
+   * Enum for touch id sensor type
+   */
+  TouchID: 'TouchID',
+  /**
+   * Enum for face id sensor type
+   */
+  FaceID: 'FaceID',
+  /**
    * Returns promise that resolves to null, TouchID, or FaceID
    * @returns {Promise} Promise that resolves to null, TouchID, or FaceID
    */
