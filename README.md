@@ -58,6 +58,36 @@ This package is designed to make server authentication using biometrics easier. 
 
 When a user enrolls in biometrics, a key pair is generated.  The private key is stored securely on the device and the public key is sent to a server for registration.  When the user wishes to authenticate, the user is prompted for biometrics, which unlocks the securely stored private key.  Then a cryptographic signature is generated and sent to the server for verification.  The server then verifies the signature.  If the verification was successful, the server returns an appropriate response and authorizes the user.
 
+## Constants
+
+### TouchID
+
+A constant for the touch id sensor type, evaluates to `'TouchID'`
+
+__Example__
+
+```js
+import Biometrics from 'react-native-biometrics'
+
+if (biometryType === Biometrics.TouchID) {
+  //do something fingerprint specific
+}
+```
+
+### FaceID
+
+A constant for the face id sensor type, evaluates to `'FaceID'`
+
+__Example__
+
+```js
+import Biometrics from 'react-native-biometrics'
+
+if (biometryType === Biometrics.FaceID) {
+  //do something face id specific
+}
+```
+
 ## Methods
 
 ### isSensorAvailable()
@@ -71,9 +101,9 @@ import Biometrics from 'react-native-biometrics'
 
 Biometrics.isSensorAvailable()
   .then((biometryType) => {
-    if (biometryType === 'TouchID') {
+    if (biometryType === Biometrics.TouchID) {
       console.log('TouchID is supported')
-    } else if (biometryType === 'FaceID') {
+    } else if (biometryType === Biometrics.FaceID) {
       console.log('FaceID is supported')
     } else {
       console.log('Biometrics not supported')
