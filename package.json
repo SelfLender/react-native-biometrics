@@ -1,11 +1,12 @@
 {
   "name": "react-native-biometrics",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "React Native biometric functionality for signing and encryption",
   "main": "lib/index.js",
   "scripts": {
+    "clean": "rm -rf lib && rm -rf node_modules && npm install",
     "build": "babel src -d lib",
-    "release": "npm run build && npm publish"
+    "release": "npm run clean && npm run build && npm publish"
   },
   "keywords": [
     "react-native",

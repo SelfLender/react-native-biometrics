@@ -41,9 +41,6 @@ public class ReactNativeBiometricsDialog extends DialogFragment implements React
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Do not create a new Fragment when the Activity is re-created such as orientation changes.
-        setRetainInstance(true);
         setStyle(DialogFragment.STYLE_NORMAL, R.style.BiometricsDialog);
     }
 
@@ -101,17 +98,23 @@ public class ReactNativeBiometricsDialog extends DialogFragment implements React
     @Override
     public void onAuthenticated(FingerprintManager.CryptoObject cryptoObject) {
         dismissAllowingStateLoss();
-        biometricAuthCallback.onAuthenticated(cryptoObject);
+        if (biometricAuthCallback != null) {
+            biometricAuthCallback.onAuthenticated(cryptoObject);
+        }
     }
 
     @Override
     public void onCancel() {
-        biometricAuthCallback.onCancel();
+        if (biometricAuthCallback != null) {
+            biometricAuthCallback.onCancel();
+        }
     }
 
     @Override
     public void onError() {
         dismissAllowingStateLoss();
-        biometricAuthCallback.onError();
+        if (biometricAuthCallback != null) {
+            biometricAuthCallback.onError();
+        }
     }
 }
