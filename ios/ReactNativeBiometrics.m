@@ -61,7 +61,7 @@ RCT_EXPORT_METHOD(createKeys: (NSString *)promptMessage resolver:(RCTPromiseReso
           id publicKey = CFBridgingRelease(SecKeyCopyPublicKey((SecKeyRef)privateKey));
           CFDataRef publicKeyDataRef = SecKeyCopyExternalRepresentation((SecKeyRef)publicKey, nil);
           NSData *publicKeyData = (__bridge NSData *)publicKeyDataRef;
-          NSString *publicKeyString = [publicKeyData base64EncodedStringWithOptions:0];
+          NSString *publicKeyString = [self addHeaderPublickey:publicKeyData];
           resolve(publicKeyString);
         } else {
           NSString *message = [NSString stringWithFormat:@"Key generation error: %@", gen_error];
@@ -172,6 +172,72 @@ RCT_EXPORT_METHOD(createSignature: (NSString *)promptMessage payload:(NSString *
   }
 
   return message;
+}
+
+
+- (NSString *)addHeaderPublickey:(NSData *)publicKeyData {
+    NSString *str = @"";
+    
+    unsigned char builder[15];
+    NSMutableData * encKey = [[NSMutableData alloc] init];
+    unsigned long bitstringEncLength;
+    
+    static const unsigned char _encodedRSAEncryptionOID[15] = {
+        
+        /* Sequence of length 0xd made up of OID followed by NULL */
+        0x30, 0x0d, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86,
+        0xf7, 0x0d, 0x01, 0x01, 0x01, 0x05, 0x00
+        
+    };
+    // When we get to the bitstring - how will we encode it?
+    if  ([publicKeyData length ] + 1  < 128 )
+        bitstringEncLength = 1 ;
+    else
+        bitstringEncLength = (([publicKeyData length ] +1 ) / 256 ) + 2 ;
+    //
+    //        // Overall we have a sequence of a certain length
+    builder[0] = 0x30;    // ASN.1 encoding representing a SEQUENCE
+    //        // Build up overall size made up of -
+    //        // size of OID + size of bitstring encoding + size of actual key
+    size_t i = sizeof(_encodedRSAEncryptionOID) + 2 + bitstringEncLength + [publicKeyData length];
+    size_t j = encodeLength(&builder[1], i);
+    [encKey appendBytes:builder length:j +1];
+    
+    // First part of the sequence is the OID
+    [encKey appendBytes:_encodedRSAEncryptionOID
+                 length:sizeof(_encodedRSAEncryptionOID)];
+    
+    // Now add the bitstring
+    builder[0] = 0x03;
+    j = encodeLength(&builder[1], [publicKeyData length] + 1);
+    builder[j+1] = 0x00;
+    [encKey appendBytes:builder length:j + 2];
+    
+    // Now the actual key
+    [encKey appendData:publicKeyData];
+    
+    // Now translate the result to a Base64 string
+    str = [encKey base64EncodedStringWithOptions:0];
+    
+    return str;
+}
+
+size_t encodeLength(unsigned char * buf, size_t length) {
+    
+    // encode length in ASN.1 DER format
+    if (length < 128) {
+        buf[0] = length;
+        return 1;
+    }
+    
+    size_t i = (length / 256) + 1;
+    buf[0] = i + 0x80;
+    for (size_t j = 0 ; j < i; ++j) {
+        buf[i - j] = length & 0xFF;
+        length = length >> 8;
+    }
+    
+    return i + 1;
 }
 
 @end
