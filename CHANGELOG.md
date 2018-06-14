@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.1.2] - 2018-06-14
+### Changed
+- fixed public key format in iOS
+
 ## [1.1.1] - 2018-06-11
 ### Changed
 - fixed potential null pointer exception that could occur from saved android dialog fragments
@@ -27,3 +31,4 @@ All notable changes to this project will be documented in this file.
 [1.0.2]: https://github.com/SelfLender/react-native-biometrics/compare/1.0.1...1.0.2
 [1.1.0]: https://github.com/SelfLender/react-native-biometrics/compare/1.0.2...1.1.0
 [1.1.1]: https://github.com/SelfLender/react-native-biometrics/compare/1.1.0...1.1.1
+[1.1.2]: https://github.com/SelfLender/react-native-biometrics/compare/1.1.1...1.1.2
