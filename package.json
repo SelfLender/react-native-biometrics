@@ -31,7 +31,8 @@
     "android/",
     "ios/",
     "src/",
-    "lib/"
+    "lib/",
+    "index.d.ts"
   ],
   "license": "MIT",
   "peerDependencies": {

@@ -1,17 +1,5 @@
-# OSX
-#
 .DS_Store
-
-# node.js
-#
-node_modules/
-npm-debug.log
-yarn-error.log
-lib/
-
-# Xcode
-#
-ios/build/
+build/
 *.pbxuser
 !default.pbxuser
 *.mode1v3
@@ -28,12 +16,3 @@ DerivedData
 *.ipa
 *.xcuserstate
 project.xcworkspace
-
-
-# Android/IntelliJ
-#
-android/build/
-.idea
-.gradle
-local.properties
-*.iml
