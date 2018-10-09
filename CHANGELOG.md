@@ -1,6 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.1.3] - 2018-08-09
+### Changed
+- fixed typo in readme
+- fixed reported security issues from npm
+### Added
+- Added type script definitions
+
 ## [1.1.2] - 2018-06-14
 ### Changed
 - fixed public key format in iOS
@@ -32,3 +39,4 @@ All notable changes to this project will be documented in this file.
 [1.1.0]: https://github.com/SelfLender/react-native-biometrics/compare/1.0.2...1.1.0
 [1.1.1]: https://github.com/SelfLender/react-native-biometrics/compare/1.1.0...1.1.1
 [1.1.2]: https://github.com/SelfLender/react-native-biometrics/compare/1.1.1...1.1.2
+[1.1.3]: https://github.com/SelfLender/react-native-biometrics/compare/1.1.2...1.1.3
