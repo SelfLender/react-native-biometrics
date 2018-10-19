@@ -5,17 +5,16 @@ import android.app.Activity;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.rnbiometrics.R;
 
 /**
  * Created by brandon on 4/6/18.
@@ -25,14 +24,14 @@ import com.rnbiometrics.R;
 public class ReactNativeBiometricsDialog extends DialogFragment implements ReactNativeBiometricsCallback {
 
     protected String title;
-    protected FingerprintManager.CryptoObject cryptoObject;
+    protected FingerprintManagerCompat.CryptoObject cryptoObject;
     protected ReactNativeBiometricsCallback biometricAuthCallback;
 
     protected ReactNativeBiometricsHelper biometricAuthenticationHelper;
     protected Activity activity;
     protected Button cancelButton;
 
-    public void init(String title, FingerprintManager.CryptoObject cryptoObject, ReactNativeBiometricsCallback callback) {
+    public void init(String title, FingerprintManagerCompat.CryptoObject cryptoObject, ReactNativeBiometricsCallback callback) {
         this.title = title;
         this.cryptoObject = cryptoObject;
         this.biometricAuthCallback = callback;
@@ -60,7 +59,7 @@ public class ReactNativeBiometricsDialog extends DialogFragment implements React
         });
 
         biometricAuthenticationHelper = new ReactNativeBiometricsHelper(
-                activity.getSystemService(FingerprintManager.class),
+                FingerprintManagerCompat.from(getContext()),
                 (ImageView) view.findViewById(R.id.fingerprint_icon),
                 (TextView) view.findViewById(R.id.fingerprint_status),
                 this
@@ -96,7 +95,7 @@ public class ReactNativeBiometricsDialog extends DialogFragment implements React
 
     // ReactNativeBiometricsCallback methods
     @Override
-    public void onAuthenticated(FingerprintManager.CryptoObject cryptoObject) {
+    public void onAuthenticated(FingerprintManagerCompat.CryptoObject cryptoObject) {
         dismissAllowingStateLoss();
         if (biometricAuthCallback != null) {
             biometricAuthCallback.onAuthenticated(cryptoObject);

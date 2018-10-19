@@ -1,45 +1,53 @@
 package com.rnbiometrics;
 
 import android.annotation.TargetApi;
-import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
-import android.os.CancellationSignal;
+import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
+import android.support.v4.os.CancellationSignal;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.rnbiometrics.R;
 
 /**
  * Created by brandon on 4/5/18.
  */
 
 @TargetApi(Build.VERSION_CODES.M)
-public class ReactNativeBiometricsHelper extends FingerprintManager.AuthenticationCallback {
+public class ReactNativeBiometricsHelper extends FingerprintManagerCompat.AuthenticationCallback {
 
     private static final long ERROR_TIMEOUT_MILLIS = 1600;
     private static final long SUCCESS_DELAY_MILLIS = 1300;
 
-    private final FingerprintManager fingerprintManager;
+    private final FingerprintManagerCompat fingerprintManager;
     private final ImageView icon;
     private final TextView errorTextView;
     private final ReactNativeBiometricsCallback callback;
     private CancellationSignal cancellationSignal;
 
     private boolean selfCancelled;
+    private Runnable resetErrorTextRunnable = new Runnable() {
+        @Override
+        public void run() {
+            errorTextView.setTextColor(
+                    errorTextView.getResources().getColor(R.color.hint_color, null));
+            errorTextView.setText(errorTextView.getResources().getString(R.string.fingerprint_hint));
+            icon.setImageResource(R.drawable.ic_fp_40px);
+        }
+    };
 
-    ReactNativeBiometricsHelper(FingerprintManager fingerprintManager, ImageView icon,
-                                  TextView errorTextView, ReactNativeBiometricsCallback callback) {
+    ReactNativeBiometricsHelper(FingerprintManagerCompat fingerprintManager, ImageView icon,
+                                TextView errorTextView, ReactNativeBiometricsCallback callback) {
         this.fingerprintManager = fingerprintManager;
         this.icon = icon;
         this.errorTextView = errorTextView;
         this.callback = callback;
     }
 
-    public void startListening(FingerprintManager.CryptoObject cryptoObject) {
+    public void startListening(FingerprintManagerCompat.CryptoObject cryptoObject) {
         selfCancelled = false;
-
         cancellationSignal = new CancellationSignal();
         fingerprintManager
-                .authenticate(cryptoObject, cancellationSignal, 0 /* flags */, this, null);
+                .authenticate(cryptoObject, 0,
+                        cancellationSignal, this, null);
         icon.setImageResource(R.drawable.ic_fp_40px);
     }
 
@@ -75,7 +83,7 @@ public class ReactNativeBiometricsHelper extends FingerprintManager.Authenticati
     }
 
     @Override
-    public void onAuthenticationSucceeded(final FingerprintManager.AuthenticationResult result) {
+    public void onAuthenticationSucceeded(final FingerprintManagerCompat.AuthenticationResult result) {
         errorTextView.removeCallbacks(resetErrorTextRunnable);
         icon.setImageResource(R.drawable.ic_fingerprint_success);
         errorTextView.setTextColor(errorTextView.getResources().getColor(R.color.success_color, null));
@@ -95,14 +103,4 @@ public class ReactNativeBiometricsHelper extends FingerprintManager.Authenticati
         errorTextView.removeCallbacks(resetErrorTextRunnable);
         errorTextView.postDelayed(resetErrorTextRunnable, ERROR_TIMEOUT_MILLIS);
     }
-
-    private Runnable resetErrorTextRunnable = new Runnable() {
-        @Override
-        public void run() {
-            errorTextView.setTextColor(
-                    errorTextView.getResources().getColor(R.color.hint_color, null));
-            errorTextView.setText(errorTextView.getResources().getString(R.string.fingerprint_hint));
-            icon.setImageResource(R.drawable.ic_fp_40px);
-        }
-    };
 }

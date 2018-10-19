@@ -4,32 +4,26 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.KeyguardManager;
 import android.content.Context;
-import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
-import android.security.keystore.KeyGenParameterSpec;
-import android.security.keystore.KeyProperties;
-import android.util.Base64;
+import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.Signature;
-import java.security.spec.RSAKeyGenParameterSpec;
+import com.rnbiometrics.util.CryptoManager;
 
 /**
  * Created by brandon on 4/5/18.
  */
 
 public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
+    private static final String SIGNATURE_ALGORITHM = "SHA256withRSA";
+    private static final String KEY_STORE_TYPE = "AndroidKeyStore";
+    private static String BIOMETRIC_KEY_ALIAS = "biometric_key";
+    private CryptoManager cryptoManager = new CryptoManager(BIOMETRIC_KEY_ALIAS,
+            KEY_STORE_TYPE, SIGNATURE_ALGORITHM);
 
-    protected String biometricKeyAlias = "biometric_key";
 
     public ReactNativeBiometrics(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -45,14 +39,14 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 ReactApplicationContext reactApplicationContext = getReactApplicationContext();
-                FingerprintManager fingerprintManager = reactApplicationContext.getSystemService(FingerprintManager.class);
-                Boolean isHardwareDetected = fingerprintManager.isHardwareDetected();
-                Boolean hasFingerprints = fingerprintManager.hasEnrolledFingerprints();
+                FingerprintManagerCompat fingerprintManager = FingerprintManagerCompat.from(getReactApplicationContext());
+                boolean isHardwareDetected = fingerprintManager.isHardwareDetected();
+                boolean hasFingerprints = fingerprintManager.hasEnrolledFingerprints();
 
                 KeyguardManager keyguardManager = (KeyguardManager) reactApplicationContext.getSystemService(Context.KEYGUARD_SERVICE);
-                Boolean hasProtectedLockscreen = keyguardManager.isKeyguardSecure();
+                boolean hasProtectedLockScreen = keyguardManager.isKeyguardSecure();
 
-                if (isHardwareDetected && hasFingerprints && hasProtectedLockscreen) {
+                if (isHardwareDetected && hasFingerprints && hasProtectedLockScreen) {
                     promise.resolve("TouchID");
                 } else {
                     promise.resolve(null);
@@ -83,8 +77,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void deleteKeys(Promise promise) {
-        boolean deletionSuccessful = deleteBiometricKey();
-        if (deletionSuccessful) {
+        if (cryptoManager.deleteSignature()) {
             promise.resolve(true);
         } else {
             promise.reject("Error deleting biometric key from keystore", "Error deleting biometric key from keystore");
@@ -95,14 +88,8 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
     public void createSignature(String title, String payload, Promise promise) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                Signature signature = Signature.getInstance("SHA256withRSA");
-                KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
-                keyStore.load(null);
-
-                PrivateKey privateKey = (PrivateKey) keyStore.getKey(biometricKeyAlias, null);
-                signature.initSign(privateKey);
-
-                FingerprintManager.CryptoObject cryptoObject = new FingerprintManager.CryptoObject(signature);
+                FingerprintManagerCompat.CryptoObject cryptoObject = new FingerprintManagerCompat
+                        .CryptoObject(cryptoManager.getSignature());
 
                 ReactNativeBiometricsDialog dialog = new ReactNativeBiometricsDialog();
                 dialog.init(title, cryptoObject, getSignatureCallback(payload, promise));
@@ -117,30 +104,15 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
         }
     }
 
-    protected boolean deleteBiometricKey() {
-        try {
-            KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
-            keyStore.load(null);
 
-            keyStore.deleteEntry(biometricKeyAlias);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    protected ReactNativeBiometricsCallback getSignatureCallback(final String payload, final Promise promise) {
+    private ReactNativeBiometricsCallback getSignatureCallback(final String payload, final Promise promise) {
         return new ReactNativeBiometricsCallback() {
             @Override
             @TargetApi(Build.VERSION_CODES.M)
-            public void onAuthenticated(FingerprintManager.CryptoObject cryptoObject) {
+            public void onAuthenticated(FingerprintManagerCompat.CryptoObject cryptoObject) {
                 try {
-                    Signature cryptoSignature = cryptoObject.getSignature();
-                    cryptoSignature.update(payload.getBytes());
-                    byte[] signed = cryptoSignature.sign();
-                    String signedString = Base64.encodeToString(signed, Base64.DEFAULT);
-                    signedString = signedString.replaceAll("\r", "").replaceAll("\n", "");
-                    promise.resolve(signedString);
+
+                    promise.resolve(cryptoManager.sign(cryptoObject, payload));
                 } catch (Exception e) {
                     promise.reject("error creating signature: " + e.getMessage(), "error creating signature");
                 }
@@ -158,28 +130,14 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
         };
     }
 
-    protected ReactNativeBiometricsCallback getCreationCallback(final Promise promise) {
+    private ReactNativeBiometricsCallback getCreationCallback(final Promise promise) {
         return new ReactNativeBiometricsCallback() {
             @Override
             @TargetApi(Build.VERSION_CODES.M)
-            public void onAuthenticated(FingerprintManager.CryptoObject cryptoObject) {
+            public void onAuthenticated(FingerprintManagerCompat.CryptoObject cryptoObject) {
                 try {
-                    deleteBiometricKey();
-                    KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, "AndroidKeyStore");
-                    KeyGenParameterSpec keyGenParameterSpec = new KeyGenParameterSpec.Builder(biometricKeyAlias, KeyProperties.PURPOSE_SIGN)
-                            .setDigests(KeyProperties.DIGEST_SHA256)
-                            .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1)
-                            .setAlgorithmParameterSpec(new RSAKeyGenParameterSpec(2048, RSAKeyGenParameterSpec.F4))
-                            .setUserAuthenticationRequired(true)
-                            .build();
-                    keyPairGenerator.initialize(keyGenParameterSpec);
-
-                    KeyPair keyPair = keyPairGenerator.generateKeyPair();
-                    PublicKey publicKey = keyPair.getPublic();
-                    byte[] encodedPublicKey = publicKey.getEncoded();
-                    String publicKeyString = Base64.encodeToString(encodedPublicKey, Base64.DEFAULT);
-                    publicKeyString = publicKeyString.replaceAll("\r", "").replaceAll("\n", "");
-                    promise.resolve(publicKeyString);
+                    cryptoManager.InitializeKeyPair();
+                    promise.resolve(cryptoManager.getPublicKeyBase64EncodedString());
                 } catch (Exception e) {
                     promise.reject("error generating public private keys: " + e.getMessage(), "error generating public private keys");
                 }
@@ -192,7 +150,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
 
             @Override
             public void onError() {
-                promise.reject("error generating public private keys" , "error generating public private keys");
+                promise.reject("error generating public private keys", "error generating public private keys");
             }
         };
     }

@@ -1,6 +1,6 @@
 package com.rnbiometrics;
 
-import android.hardware.fingerprint.FingerprintManager;
+import android.support.v4.hardware.fingerprint.FingerprintManagerCompat;
 
 /**
  * Created by brandon on 4/9/18.
@@ -8,7 +8,7 @@ import android.hardware.fingerprint.FingerprintManager;
 
 public interface ReactNativeBiometricsCallback {
 
-    void onAuthenticated(FingerprintManager.CryptoObject cryptoObject);
+    void onAuthenticated(FingerprintManagerCompat.CryptoObject cryptoObject);
 
     void onCancel();
 
