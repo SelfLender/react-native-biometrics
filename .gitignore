@@ -37,3 +37,7 @@ android/build/
 .gradle
 local.properties
 *.iml
+
+# Gradle files
+.gradle/
+build/
