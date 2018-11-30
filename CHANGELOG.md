@@ -1,6 +1,14 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2018-11-29
+### Changed
+- upgraded default android SDK version to 28
+- upgraded gradle version and added the gradle wrapper
+- removed npmignore files in favor of gitignore
+### Added
+- Added the ability to override android SDK and build versions using gradle extra properties extension
+
 ## [1.1.3] - 2018-08-09
 ### Changed
 - fixed typo in readme
@@ -40,3 +48,4 @@ All notable changes to this project will be documented in this file.
 [1.1.1]: https://github.com/SelfLender/react-native-biometrics/compare/1.1.0...1.1.1
 [1.1.2]: https://github.com/SelfLender/react-native-biometrics/compare/1.1.1...1.1.2
 [1.1.3]: https://github.com/SelfLender/react-native-biometrics/compare/1.1.2...1.1.3
+[1.2.0]: https://github.com/SelfLender/react-native-biometrics/compare/1.1.3...1.2.0
