@@ -74,10 +74,10 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                 Activity activity = getCurrentActivity();
                 dialog.show(activity.getFragmentManager(), "fingerprint_dialog");
             } else {
-                promise.reject("cannot generate keys on android versions below 6.0", "cannot generate keys on android versions below 6.0");
+                promise.reject("Cannot generate keys on android versions below 6.0", "Cannot generate keys on android versions below 6.0");
             }
         } catch (Exception e) {
-            promise.reject("error generating public private keys: " + e.getMessage(), "error generating public private keys");
+            promise.reject("Error generating public private keys: " + e.getMessage(), "Error generating public private keys");
         }
     }
 
@@ -110,10 +110,26 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                 Activity activity = getCurrentActivity();
                 dialog.show(activity.getFragmentManager(), "fingerprint_dialog");
             } else {
-                promise.reject("cannot generate keys on android versions below 6.0", "cannot generate keys on android versions below 6.0");
+                promise.reject("Cannot generate keys on android versions below 6.0", "Cannot generate keys on android versions below 6.0");
             }
         } catch (Exception e) {
-            promise.reject("error signing payload: " + e.getMessage(), "error generating signature");
+            promise.reject("Error signing payload: " + e.getMessage(), "Error generating signature");
+        }
+    }
+
+    @ReactMethod
+    public void simplePrompt(String title, Promise promise) {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                ReactNativeBiometricsDialog dialog = new ReactNativeBiometricsDialog();
+                dialog.init(title, null, getSimplePromptCallback(promise));
+                Activity activity = getCurrentActivity();
+                dialog.show(activity.getFragmentManager(), "fingerprint_dialog");
+            } else {
+                promise.reject("Cannot display biometric prompt on android versions below 6.0", "Cannot display biometric prompt on android versions below 6.0");
+            }
+        } catch (Exception e) {
+            promise.reject("Error displaying local biometric prompt: " + e.getMessage(), "Error displaying local biometric prompt");
         }
     }
 
@@ -142,7 +158,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                     signedString = signedString.replaceAll("\r", "").replaceAll("\n", "");
                     promise.resolve(signedString);
                 } catch (Exception e) {
-                    promise.reject("error creating signature: " + e.getMessage(), "error creating signature");
+                    promise.reject("Error creating signature: " + e.getMessage(), "Error creating signature");
                 }
             }
 
@@ -153,7 +169,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
 
             @Override
             public void onError() {
-                promise.reject("error detecting fingerprint", "error detecting fingerprint");
+                promise.reject("Error detecting fingerprint", "Error detecting fingerprint");
             }
         };
     }
@@ -181,7 +197,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                     publicKeyString = publicKeyString.replaceAll("\r", "").replaceAll("\n", "");
                     promise.resolve(publicKeyString);
                 } catch (Exception e) {
-                    promise.reject("error generating public private keys: " + e.getMessage(), "error generating public private keys");
+                    promise.reject("Error generating public private keys: " + e.getMessage(), "Error generating public private keys");
                 }
             }
 
@@ -192,7 +208,26 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
 
             @Override
             public void onError() {
-                promise.reject("error generating public private keys" , "error generating public private keys");
+                promise.reject("Error generating public private keys" , "Error generating public private keys");
+            }
+        };
+    }
+
+    protected ReactNativeBiometricsCallback getSimplePromptCallback(final Promise promise) {
+        return new ReactNativeBiometricsCallback() {
+            @Override
+            public void onAuthenticated(FingerprintManager.CryptoObject cryptoObject) {
+                promise.resolve(true);
+            }
+
+            @Override
+            public void onCancel() {
+                promise.reject("User cancelled fingerprint authorization", "User cancelled fingerprint authorization");
+            }
+
+            @Override
+            public void onError() {
+                promise.reject("Error generating public private keys" , "Error generating public private keys");
             }
         };
     }

@@ -3,9 +3,10 @@
   "version": "1.2.0",
   "description": "React Native biometric functionality for signing and encryption",
   "main": "lib/index.js",
+  "types": "index.d.ts",
   "scripts": {
     "clean": "rm -rf lib && rm -rf node_modules && npm install",
-    "build": "babel src -d lib",
+    "build": "babel index.js -d lib",
     "release": "npm run clean && npm run build && npm publish"
   },
   "keywords": [

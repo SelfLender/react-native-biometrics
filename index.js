@@ -20,7 +20,7 @@ export default {
     return ReactNativeBiometrics.isSensorAvailable()
   },
   /**
-   * Prompts user with bioemtrics dialog using the passed in prompt message and
+   * Prompts user with biometrics dialog using the passed in prompt message and
    * returns promise that resolves to newly generated public keys
    * @param {string} promptMessage
    * @returns {Promise}  Promise that resolves to newly generated public key
@@ -37,7 +37,7 @@ export default {
     return ReactNativeBiometrics.deleteKeys()
   },
   /**
-   * Prompts user with bioemtrics dialog using the passed in prompt message and
+   * Prompts user with biometrics dialog using the passed in prompt message and
    * returns promise that resolves to a cryptographic signature of the payload
    * @param {string} promptMessage
    * @param {string} payload
@@ -45,5 +45,16 @@ export default {
    */
   createSignature: (promptMessage, payload) => {
     return ReactNativeBiometrics.createSignature(promptMessage, payload)
+  },
+  /**
+   * Prompts user with biometrics dialog using the passed in prompt message and
+   * returns promise that resolves if the user passes, and
+   * rejects if the user fails or cancels
+   * @param {string} promptMessage
+   * @returns {Promise}  Promise that resolves if the user passes, and
+   * rejects if the user fails or cancels
+   */
+  simplePrompt: (promptMessage) => {
+    return ReactNativeBiometrics.simplePrompt(promptMessage)
   }
 }
