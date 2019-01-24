@@ -176,7 +176,7 @@ Biometrics.createSignature('Sign in', payload)
 
 ### simplePrompt(promptMessage)
 
-Prompts the user for their fingerprint or face id. Returns a 'Promise' that resolves if the user provides a valid fingerprint or face id, otherwise the promise rejects.
+Prompts the user for their fingerprint or face id. Returns a `Promise` that resolves if the user provides a valid fingerprint or face id, otherwise the promise rejects.
 
 NOTE: This only validates a user's biometrics.  This should not be used to log a user in or authenticate with a server, instead use `createSignature`.  It should only be used to gate certain user actions within an app.
 

@@ -1,28 +1,35 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2019-1-24
+### Changed
+- Removed src directory and moved index.js to the root
+- Made sure all android error messages start with a capital letter
+### Added
+- Added a function for simply displaying a biometric prompt
+
 ## [1.2.0] - 2018-11-29
 ### Changed
-- upgraded default android SDK version to 28
-- upgraded gradle version and added the gradle wrapper
-- removed npmignore files in favor of gitignore
+- Upgraded default android SDK version to 28
+- Upgraded gradle version and added the gradle wrapper
+- Removed npmignore files in favor of gitignore
 ### Added
 - Added the ability to override android SDK and build versions using gradle extra properties extension
 
 ## [1.1.3] - 2018-08-09
 ### Changed
-- fixed typo in readme
-- fixed reported security issues from npm
+- Fixed typo in readme
+- Fixed reported security issues from npm
 ### Added
 - Added type script definitions
 
 ## [1.1.2] - 2018-06-14
 ### Changed
-- fixed public key format in iOS
+- Fixed public key format in iOS
 
 ## [1.1.1] - 2018-06-11
 ### Changed
-- fixed potential null pointer exception that could occur from saved android dialog fragments
+- Fixed potential null pointer exception that could occur from saved android dialog fragments
 
 ## [1.1.0] - 2018-05-03
 ### Added
@@ -49,3 +56,4 @@ All notable changes to this project will be documented in this file.
 [1.1.2]: https://github.com/SelfLender/react-native-biometrics/compare/1.1.1...1.1.2
 [1.1.3]: https://github.com/SelfLender/react-native-biometrics/compare/1.1.2...1.1.3
 [1.2.0]: https://github.com/SelfLender/react-native-biometrics/compare/1.1.3...1.2.0
+[1.3.0]: https://github.com/SelfLender/react-native-biometrics/compare/1.2.0...1.3.0
