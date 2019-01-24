@@ -13,7 +13,7 @@ declare module 'react-native-biometrics' {
    */
   function isSensorAvailable(): Promise<string>;
   /**
-   * Prompts user with bioemtrics dialog using the passed in prompt message and
+   * Prompts user with biometrics dialog using the passed in prompt message and
    * returns promise that resolves to newly generated public keys
    * @param {string} promptMessage
    * @returns {Promise}  Promise that resolves to newly generated public key
@@ -26,7 +26,7 @@ declare module 'react-native-biometrics' {
    */
   function deleteKeys(): Promise<boolean>;
   /**
-   * Prompts user with bioemtrics dialog using the passed in prompt message and
+   * Prompts user with biometrics dialog using the passed in prompt message and
    * returns promise that resolves to a cryptographic signature of the payload
    * @param {string} promptMessage
    * @param {string} payload
@@ -36,4 +36,13 @@ declare module 'react-native-biometrics' {
     promptMessage: string,
     payload: string
     ): Promise<string>;
+   /**
+   * Prompts user with biometrics dialog using the passed in prompt message and
+   * returns promise that resolves if the user passes, and
+   * rejects if the user fails or cancels
+   * @param {string} promptMessage
+   * @returns {Promise}  Promise that resolves if the user passes, and
+   * rejects if the user fails or cancels
+   */
+  function simplePrompt(promptMessage: string): Promise<boolean>;
 }
