@@ -1,6 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.4.0] - 2019-4-3
+### Changed
+- Fixed reported security issues from npm
+- Added a dependency on appcompat-v7 in android to ensure required UI libraries are available
+### Added
+- Added a podspec file
+
 ## [1.3.0] - 2019-1-24
 ### Changed
 - Removed src directory and moved index.js to the root
@@ -57,3 +64,4 @@ All notable changes to this project will be documented in this file.
 [1.1.3]: https://github.com/SelfLender/react-native-biometrics/compare/1.1.2...1.1.3
 [1.2.0]: https://github.com/SelfLender/react-native-biometrics/compare/1.1.3...1.2.0
 [1.3.0]: https://github.com/SelfLender/react-native-biometrics/compare/1.2.0...1.3.0
+[1.4.0]: https://github.com/SelfLender/react-native-biometrics/compare/1.3.0...1.4.0

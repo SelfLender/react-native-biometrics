@@ -6,6 +6,9 @@ def DEFAULT_COMPILE_SDK_VERSION             = 28
 def DEFAULT_BUILD_TOOLS_VERSION             = "28.0.3"
 def DEFAULT_MIN_SDK_VERSION                 = 16
 def DEFAULT_TARGET_SDK_VERSION              = 28
+def DEFAULT_SUPPORT_LIB_VERSION             = "28.0.0"
+
+def SUPPORT_LIB_VERSION = rootProject.hasProperty('supportLibVersion') ? rootProject.supportLibVersion : DEFAULT_SUPPORT_LIB_VERSION
 
 buildscript {
     repositories {
@@ -25,8 +28,6 @@ android {
     defaultConfig {
         minSdkVersion rootProject.hasProperty('minSdkVersion') ? rootProject.minSdkVersion : DEFAULT_MIN_SDK_VERSION
         targetSdkVersion rootProject.hasProperty('targetSdkVersion') ? rootProject.targetSdkVersion : DEFAULT_TARGET_SDK_VERSION
-        versionCode 1
-        versionName "1.0"
     }
     lintOptions {
         abortOnError false
@@ -39,5 +40,6 @@ repositories {
 }
 
 dependencies {
+    implementation "com.android.support:appcompat-v7:${SUPPORT_LIB_VERSION}"
     implementation 'com.facebook.react:react-native:+'
 }
