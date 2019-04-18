@@ -111,13 +111,13 @@ Biometrics.isSensorAvailable()
   })
 ```
 
-### createKeys(promptMessage)
+### createKeys([promptMessage])
 
 Prompts the user for their fingerprint or face id, then generates a public private RSA 2048 key pair that will be stored in the device keystore.  Returns a `Promise` that resolves to a base64 encoded string representing the public key.
 
 __Arguments__
 
-- `promptMessage` - string that will be displayed in the fingerprint or face id prompt
+- `promptMessage` - optional string that will be displayed in the fingerprint or face id prompt, if no prompt message is provided, no prompt will be displayed.
 
 __Example__
 
