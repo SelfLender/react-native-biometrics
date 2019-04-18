@@ -8,6 +8,7 @@ import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
+import android.text.TextUtils;
 import android.util.Base64;
 
 import com.facebook.react.bridge.Promise;
@@ -69,10 +70,17 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
     public void createKeys(String title, Promise promise) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                ReactNativeBiometricsDialog dialog = new ReactNativeBiometricsDialog();
-                dialog.init(title, null, getCreationCallback(promise));
-                Activity activity = getCurrentActivity();
-                dialog.show(activity.getFragmentManager(), "fingerprint_dialog");
+                if (TextUtils.isEmpty(title)) {
+                    // if no title is provided for the create keys prompt, treat the action as
+                    // authenticated and create keys
+                    ReactNativeBiometricsCallback createKeysCallback = getCreationCallback(promise);
+                    createKeysCallback.onAuthenticated(null);
+                } else {
+                    ReactNativeBiometricsDialog dialog = new ReactNativeBiometricsDialog();
+                    dialog.init(title, null, getCreationCallback(promise));
+                    Activity activity = getCurrentActivity();
+                    dialog.show(activity.getFragmentManager(), "fingerprint_dialog");
+                }
             } else {
                 promise.reject("Cannot generate keys on android versions below 6.0", "Cannot generate keys on android versions below 6.0");
             }
