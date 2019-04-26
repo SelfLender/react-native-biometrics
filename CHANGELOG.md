@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.5.1] - 2019-4-26
+### Changed
+- Updated doc strings and type definition for the createKeys function
+
 ## [1.5.0] - 2019-4-17
 ### Added
 - Added the ability to not display a biometrics prompt when creating keys
@@ -70,3 +74,4 @@ All notable changes to this project will be documented in this file.
 [1.3.0]: https://github.com/SelfLender/react-native-biometrics/compare/1.2.0...1.3.0
 [1.4.0]: https://github.com/SelfLender/react-native-biometrics/compare/1.3.0...1.4.0
 [1.5.0]: https://github.com/SelfLender/react-native-biometrics/compare/1.4.0...1.5.0
+[1.5.1]: https://github.com/SelfLender/react-native-biometrics/compare/1.5.0...1.5.1
