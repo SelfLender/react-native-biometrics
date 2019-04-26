@@ -18,7 +18,7 @@ declare module 'react-native-biometrics' {
    * @param {string} promptMessage
    * @returns {Promise}  Promise that resolves to newly generated public key
    */
-  function createKeys(promptMessage: string): Promise<string>;
+  function createKeys(promptMessage?: string): Promise<string>;
    /**
    * Returns promise that resolves to true or false indicating if the keys
    * were properly deleted
