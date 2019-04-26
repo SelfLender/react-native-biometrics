@@ -20,8 +20,9 @@ export default {
     return ReactNativeBiometrics.isSensorAvailable()
   },
   /**
-   * Prompts user with biometrics dialog using the passed in prompt message and
-   * returns promise that resolves to newly generated public keys
+   * Prompts user with biometrics dialog using the passed in prompt message if
+   * it is provided, returns promise that resolves to the public key of the
+   * newly generated key pair
    * @param {string} promptMessage
    * @returns {Promise}  Promise that resolves to newly generated public key
    */
