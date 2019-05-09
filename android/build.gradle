@@ -12,8 +12,8 @@ def SUPPORT_LIB_VERSION = rootProject.hasProperty('supportLibVersion') ? rootPro
 
 buildscript {
     repositories {
-        jcenter()
         google()
+        jcenter()
     }
 
     dependencies {
