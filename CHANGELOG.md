@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.5.2] - 2019-5-9
+### Changed
+- Fixed android compilation error by re-organizing order of gradle repositories
+
 ## [1.5.1] - 2019-4-26
 ### Changed
 - Updated doc strings and type definition for the createKeys function
@@ -75,3 +79,4 @@ All notable changes to this project will be documented in this file.
 [1.4.0]: https://github.com/SelfLender/react-native-biometrics/compare/1.3.0...1.4.0
 [1.5.0]: https://github.com/SelfLender/react-native-biometrics/compare/1.4.0...1.5.0
 [1.5.1]: https://github.com/SelfLender/react-native-biometrics/compare/1.5.0...1.5.1
+[1.5.2]: https://github.com/SelfLender/react-native-biometrics/compare/1.5.1...1.5.2
