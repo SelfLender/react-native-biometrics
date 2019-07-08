@@ -91,11 +91,16 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void deleteKeys(Promise promise) {
-        boolean deletionSuccessful = deleteBiometricKey();
-        if (deletionSuccessful) {
-            promise.resolve(true);
+        if (biometricKeyExists()) {
+            boolean deletionSuccessful = deleteBiometricKey();
+
+            if (deletionSuccessful) {
+                promise.resolve(true);
+            } else {
+                promise.reject("Error deleting biometric key from keystore", "Error deleting biometric key from keystore");
+            }
         } else {
-            promise.reject("Error deleting biometric key from keystore", "Error deleting biometric key from keystore");
+            promise.resolve(false);
         }
     }
 
@@ -139,6 +144,17 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
         } catch (Exception e) {
             promise.reject("Error displaying local biometric prompt: " + e.getMessage(), "Error displaying local biometric prompt");
         }
+    }
+
+    protected boolean biometricKeyExists() {
+      try {
+        KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+        keyStore.load(null);
+
+        return keyStore.containsAlias(biometricKeyAlias);
+      } catch (Exception e) {
+        return false;
+      }
     }
 
     protected boolean deleteBiometricKey() {

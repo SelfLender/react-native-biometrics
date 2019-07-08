@@ -86,13 +86,19 @@ RCT_EXPORT_METHOD(createKeys: (NSString *)promptMessage resolver:(RCTPromiseReso
 
 RCT_EXPORT_METHOD(deleteKeys: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-    OSStatus status = [self deleteBiometricKey];
+    BOOL biometricKeyExists = [self biometricKeyExists];
 
-    if (status == noErr) {
-      resolve(@(YES));
+    if (biometricKeyExists) {
+      OSStatus status = [self deleteBiometricKey];
+
+      if (status == noErr) {
+        resolve(@(YES));
+      } else {
+        NSString *message = [NSString stringWithFormat:@"Key not found: %@",[self keychainErrorToString:status]];
+        reject(@"deletion_error", message, nil);
+      }
     } else {
-      NSString *message = [NSString stringWithFormat:@"Key not found: %@",[self keychainErrorToString:status]];
-      reject(@"deletion_error", message, nil);
+        resolve(@(NO));
     }
   });
 }
@@ -151,6 +157,18 @@ RCT_EXPORT_METHOD(simplePrompt: (NSString *)promptMessage resolver:(RCTPromiseRe
   return biometricKeyTag;
 }
 
+- (BOOL) biometricKeyExists {
+  NSData *biometricKeyTag = [self getBiometricKeyTag];
+  NSDictionary *searchQuery = @{
+                                (id)kSecClass: (id)kSecClassKey,
+                                (id)kSecAttrApplicationTag: biometricKeyTag,
+                                (id)kSecAttrKeyType: (id)kSecAttrKeyTypeRSA
+                                };
+
+  OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)searchQuery, nil);
+  return status == errSecSuccess;
+}
+
 -(OSStatus) deleteBiometricKey {
   NSData *biometricKeyTag = [self getBiometricKeyTag];
   NSDictionary *deleteQuery = @{
@@ -201,7 +219,6 @@ RCT_EXPORT_METHOD(simplePrompt: (NSString *)promptMessage resolver:(RCTPromiseRe
 
 
 - (NSData *)addHeaderPublickey:(NSData *)publicKeyData {
-    NSString *str = @"";
 
     unsigned char builder[15];
     NSMutableData * encKey = [[NSMutableData alloc] init];
