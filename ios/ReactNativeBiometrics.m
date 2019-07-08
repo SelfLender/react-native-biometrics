@@ -29,6 +29,7 @@ RCT_EXPORT_METHOD(createKeys: (NSString *)promptMessage resolver:(RCTPromiseReso
       [self createAndStoreKeyPair:resolve rejecter:reject];
     } else {
       LAContext *context = [[LAContext alloc] init];
+      context.localizedFallbackTitle = @"";
 
       [context evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics localizedReason:promptMessage reply:^(BOOL success, NSError *fingerprintError) {
         if (success) {
@@ -132,6 +133,7 @@ RCT_EXPORT_METHOD(createSignature: (NSString *)promptMessage payload:(NSString *
 RCT_EXPORT_METHOD(simplePrompt: (NSString *)promptMessage resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     LAContext *context = [[LAContext alloc] init];
+    context.localizedFallbackTitle = @"";
 
     [context evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics localizedReason:promptMessage reply:^(BOOL success, NSError *fingerprintError) {
       if (success) {
