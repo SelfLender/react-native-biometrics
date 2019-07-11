@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.6.0] - 2019-7-10
+### Changed
+- Disabled use password option on iOS by default
+- Detected if keys exists before trying to delete them and returned false in promise result in order to prevent error from occurring
+
 ## [1.5.2] - 2019-5-9
 ### Changed
 - Fixed android compilation error by re-organizing order of gradle repositories
@@ -80,3 +85,4 @@ All notable changes to this project will be documented in this file.
 [1.5.0]: https://github.com/SelfLender/react-native-biometrics/compare/1.4.0...1.5.0
 [1.5.1]: https://github.com/SelfLender/react-native-biometrics/compare/1.5.0...1.5.1
 [1.5.2]: https://github.com/SelfLender/react-native-biometrics/compare/1.5.1...1.5.2
+[1.6.0]: https://github.com/SelfLender/react-native-biometrics/compare/1.5.2...1.6.0
