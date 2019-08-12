@@ -40,7 +40,8 @@
     "url": "https://github.com/SelfLender/react-native-biometrics/issues"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-react-native": "^4.0.0"
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "metro-react-native-babel-preset": "^0.56.0"
   }
 }
