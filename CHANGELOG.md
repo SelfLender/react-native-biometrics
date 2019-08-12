@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.6.1] - 2019-8-12
+### Changed
+- Fixed reported security issues from npm in dev dependencies
+
 ## [1.6.0] - 2019-7-10
 ### Changed
 - Disabled use password option on iOS by default
@@ -86,3 +90,4 @@ All notable changes to this project will be documented in this file.
 [1.5.1]: https://github.com/SelfLender/react-native-biometrics/compare/1.5.0...1.5.1
 [1.5.2]: https://github.com/SelfLender/react-native-biometrics/compare/1.5.1...1.5.2
 [1.6.0]: https://github.com/SelfLender/react-native-biometrics/compare/1.5.2...1.6.0
+[1.6.1]: https://github.com/SelfLender/react-native-biometrics/compare/1.6.0...1.6.1
