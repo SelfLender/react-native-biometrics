@@ -8,14 +8,12 @@ import android.content.DialogInterface;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.rnbiometrics.R;
 
 /**
  * Created by brandon on 4/6/18.
@@ -44,9 +42,8 @@ public class ReactNativeBiometricsDialog extends DialogFragment implements React
         setStyle(DialogFragment.STYLE_NORMAL, R.style.BiometricsDialog);
     }
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         getDialog().setTitle(title);
         View view = inflater.inflate(R.layout.fingerprint_dialog_container, container, false);
         cancelButton = (Button) view.findViewById(R.id.cancel_button);
