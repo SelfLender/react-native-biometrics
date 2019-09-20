@@ -35,7 +35,8 @@ RCT_EXPORT_METHOD(createKeys: (NSString *)promptMessage resolver:(RCTPromiseReso
         if (success) {
           [self createAndStoreKeyPair:resolve rejecter:reject];
         } else {
-          reject(@"fingerprint_error", @"Could not confirm fingerprint", nil);
+          NSString *message = [NSString stringWithFormat:@"Fingerprint error: %@", fingerprintError];
+          reject(@"fingerprint_error", message, nil);
         }
       }];
     }
@@ -145,7 +146,8 @@ RCT_EXPORT_METHOD(simplePrompt: (NSString *)promptMessage resolver:(RCTPromiseRe
       if (success) {
         resolve(@(YES));
       } else {
-        reject(@"fingerprint_error", @"Could not confirm fingerprint", nil);
+        NSString *message = [NSString stringWithFormat:@"Fingerprint error: %@", fingerprintError];
+        reject(@"fingerprint_error", message, nil);
       }
     }];
   });
