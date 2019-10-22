@@ -109,7 +109,7 @@ Biometrics.isSensorAvailable()
   })
 ```
 
-### createKeys([promptMessage])
+### createKeys([promptMessage],[params])
 
 Prompts the user for their fingerprint or face id, then generates a public private RSA 2048 key pair that will be stored in the device keystore.  Returns a `Promise` that resolves to a base64 encoded string representing the public key.
 
@@ -148,7 +148,7 @@ Biometrics.deleteKeys()
   })
 ```
 
-### createSignature(promptMessage, payload)
+### createSignature(promptMessage, payload,[params])
 
 Prompts the user for their fingerprint or face id in order to retrieve the private key from the keystore, then uses the private key to generate a RSA PKCS#1v1.5 SHA 256 signature.  Returns a `Promise` that resolves to a base64 encoded string representing the signature.
 
@@ -174,7 +174,7 @@ Biometrics.createSignature('Sign in', payload)
   })
 ```
 
-### simplePrompt(promptMessage)
+### simplePrompt(promptMessage,[params])
 
 Prompts the user for their fingerprint or face id. Returns a `Promise` that resolves if the user provides a valid fingerprint or face id, otherwise the promise rejects.
 
@@ -190,6 +190,32 @@ __Example__
 import Biometrics from 'react-native-biometrics'
 
 Biometrics.simplePrompt('Confirm fingerprint')
+  .then(() => {
+    console.log('successful fingerprint provided')
+  })
+  .catch(() => {
+    console.log('fingerprint failed or prompt was cancelled')
+  })
+```
+
+__Android message localization__
+
+For localization of android message you can pass additional `params` object.
+
+__Example__
+
+```js
+import Biometrics from 'react-native-biometrics'
+
+const params = {
+  fingerprint_message: 'Fingerprint description',
+  fingerprint_cancel: 'Cancel',
+  fingerprint_hint: 'Press touch',
+  fingerprint_recognized: 'Completed',
+  fingerprint_not_recognized: 'Not completed'
+}
+
+Biometrics.simplePrompt('Confirm fingerprint',params)
   .then(() => {
     console.log('successful fingerprint provided')
   })

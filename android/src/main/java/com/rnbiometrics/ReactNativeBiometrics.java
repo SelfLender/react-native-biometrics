@@ -15,6 +15,7 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableMap;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -67,7 +68,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void createKeys(String title, Promise promise) {
+    public void createKeys(String title,ReadableMap params, Promise promise) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (TextUtils.isEmpty(title)) {
@@ -77,7 +78,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                     createKeysCallback.onAuthenticated(null);
                 } else {
                     ReactNativeBiometricsDialog dialog = new ReactNativeBiometricsDialog();
-                    dialog.init(title, null, getCreationCallback(promise));
+                    dialog.init(title,params, null, getCreationCallback(promise));
                     Activity activity = getCurrentActivity();
                     dialog.show(activity.getFragmentManager(), "fingerprint_dialog");
                 }
@@ -105,7 +106,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void createSignature(String title, String payload, Promise promise) {
+    public void createSignature(String title,ReadableMap params, String payload, Promise promise) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 Signature signature = Signature.getInstance("SHA256withRSA");
@@ -118,7 +119,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                 FingerprintManager.CryptoObject cryptoObject = new FingerprintManager.CryptoObject(signature);
 
                 ReactNativeBiometricsDialog dialog = new ReactNativeBiometricsDialog();
-                dialog.init(title, cryptoObject, getSignatureCallback(payload, promise));
+                dialog.init(title,params, cryptoObject, getSignatureCallback(payload, promise));
 
                 Activity activity = getCurrentActivity();
                 dialog.show(activity.getFragmentManager(), "fingerprint_dialog");
@@ -131,11 +132,11 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void simplePrompt(String title, Promise promise) {
+    public void simplePrompt(String title,ReadableMap params, Promise promise) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 ReactNativeBiometricsDialog dialog = new ReactNativeBiometricsDialog();
-                dialog.init(title, null, getSimplePromptCallback(promise));
+                dialog.init(title,params, null, getSimplePromptCallback(promise));
                 Activity activity = getCurrentActivity();
                 dialog.show(activity.getFragmentManager(), "fingerprint_dialog");
             } else {

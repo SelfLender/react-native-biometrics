@@ -26,8 +26,8 @@ export default {
    * @param {string} promptMessage
    * @returns {Promise}  Promise that resolves to newly generated public key
    */
-  createKeys: (promptMessage) => {
-    return ReactNativeBiometrics.createKeys(promptMessage)
+  createKeys: (promptMessage,params = {}) => {
+    return ReactNativeBiometrics.createKeys(promptMessage,params)
   },
   /**
    * Returns promise that resolves to true or false indicating if the keys
@@ -44,18 +44,19 @@ export default {
    * @param {string} payload
    * @returns {Promise}  Promise that resolves to cryptographic signature
    */
-  createSignature: (promptMessage, payload) => {
-    return ReactNativeBiometrics.createSignature(promptMessage, payload)
+  createSignature: (promptMessage,payload, params = {}) => {
+    return ReactNativeBiometrics.createSignature(promptMessage, payload,params)
   },
   /**
    * Prompts user with biometrics dialog using the passed in prompt message and
    * returns promise that resolves if the user passes, and
    * rejects if the user fails or cancels
    * @param {string} promptMessage
+   * @param {object} params
    * @returns {Promise}  Promise that resolves if the user passes, and
    * rejects if the user fails or cancels
    */
-  simplePrompt: (promptMessage) => {
-    return ReactNativeBiometrics.simplePrompt(promptMessage)
+  simplePrompt: (promptMessage,params = {}) => {
+    return ReactNativeBiometrics.simplePrompt(promptMessage,params)
   }
 }
