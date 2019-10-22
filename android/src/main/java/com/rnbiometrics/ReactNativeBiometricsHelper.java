@@ -7,6 +7,7 @@ import android.os.CancellationSignal;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.rnbiometrics.R;
+import com.facebook.react.bridge.ReadableMap;
 
 /**
  * Created by brandon on 4/5/18.
@@ -23,15 +24,17 @@ public class ReactNativeBiometricsHelper extends FingerprintManager.Authenticati
     private final TextView errorTextView;
     private final ReactNativeBiometricsCallback callback;
     private CancellationSignal cancellationSignal;
+    private ReadableMap params;
 
     private boolean selfCancelled;
 
     ReactNativeBiometricsHelper(FingerprintManager fingerprintManager, ImageView icon,
-                                  TextView errorTextView, ReactNativeBiometricsCallback callback) {
+                                  TextView errorTextView,ReadableMap params, ReactNativeBiometricsCallback callback) {
         this.fingerprintManager = fingerprintManager;
         this.icon = icon;
         this.errorTextView = errorTextView;
         this.callback = callback;
+        this.params = params;
     }
 
     public void startListening(FingerprintManager.CryptoObject cryptoObject) {
@@ -71,7 +74,11 @@ public class ReactNativeBiometricsHelper extends FingerprintManager.Authenticati
 
     @Override
     public void onAuthenticationFailed() {
-        showError(errorTextView.getResources().getString(R.string.fingerprint_not_recognized));
+        if (params.hasKey("fingerprint_not_recognized")) {
+            showError(params.getString("fingerprint_not_recognized"));
+        } else {
+            showError(errorTextView.getResources().getString(R.string.fingerprint_not_recognized));
+        }
     }
 
     @Override
@@ -79,7 +86,11 @@ public class ReactNativeBiometricsHelper extends FingerprintManager.Authenticati
         errorTextView.removeCallbacks(resetErrorTextRunnable);
         icon.setImageResource(R.drawable.ic_fingerprint_success);
         errorTextView.setTextColor(errorTextView.getResources().getColor(R.color.success_color, null));
-        errorTextView.setText(errorTextView.getResources().getString(R.string.fingerprint_recognized));
+        if (params.hasKey("fingerprint_recognized")) {
+            errorTextView.setText(params.getString("fingerprint_recognized"));
+        } else {
+            errorTextView.setText(errorTextView.getResources().getString(R.string.fingerprint_recognized));
+        }
         icon.postDelayed(new Runnable() {
             @Override
             public void run() {
