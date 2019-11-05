@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.7.0] - 2019-11-5
+### Changed
+- Removed dependency on android app compat library for compatibility with androidx
+- Used new access control policy for ios keystore
+
 ## [1.6.1] - 2019-8-12
 ### Changed
 - Fixed reported security issues from npm in dev dependencies
@@ -91,3 +96,4 @@ All notable changes to this project will be documented in this file.
 [1.5.2]: https://github.com/SelfLender/react-native-biometrics/compare/1.5.1...1.5.2
 [1.6.0]: https://github.com/SelfLender/react-native-biometrics/compare/1.5.2...1.6.0
 [1.6.1]: https://github.com/SelfLender/react-native-biometrics/compare/1.6.0...1.6.1
+[1.7.0]: https://github.com/SelfLender/react-native-biometrics/compare/1.6.1...1.7.0
