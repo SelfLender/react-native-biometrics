@@ -98,17 +98,22 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
     public void createKeys(String title, Promise promise) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (TextUtils.isEmpty(title)) {
-                    // if no title is provided for the create keys prompt, treat the action as
-                    // authenticated and create keys
-                    ReactNativeBiometricsCallback createKeysCallback = getCreationCallback(promise);
-                    createKeysCallback.onAuthenticated(null);
-                } else {
-                    ReactNativeBiometricsDialog dialog = new ReactNativeBiometricsDialog();
-                    dialog.init(title, null, getCreationCallback(promise));
-                    Activity activity = getCurrentActivity();
-                    dialog.show(activity.getFragmentManager(), "fingerprint_dialog");
-                }
+                deleteBiometricKey();
+                KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, "AndroidKeyStore");
+                KeyGenParameterSpec keyGenParameterSpec = new KeyGenParameterSpec.Builder(biometricKeyAlias, KeyProperties.PURPOSE_SIGN)
+                        .setDigests(KeyProperties.DIGEST_SHA256)
+                        .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1)
+                        .setAlgorithmParameterSpec(new RSAKeyGenParameterSpec(2048, RSAKeyGenParameterSpec.F4))
+                        .setUserAuthenticationRequired(true)
+                        .build();
+                keyPairGenerator.initialize(keyGenParameterSpec);
+
+                KeyPair keyPair = keyPairGenerator.generateKeyPair();
+                PublicKey publicKey = keyPair.getPublic();
+                byte[] encodedPublicKey = publicKey.getEncoded();
+                String publicKeyString = Base64.encodeToString(encodedPublicKey, Base64.DEFAULT);
+                publicKeyString = publicKeyString.replaceAll("\r", "").replaceAll("\n", "");
+                promise.resolve(publicKeyString);
             } else {
                 promise.reject("Cannot generate keys on android versions below 6.0", "Cannot generate keys on android versions below 6.0");
             }
