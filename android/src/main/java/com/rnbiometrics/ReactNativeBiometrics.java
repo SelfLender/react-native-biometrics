@@ -6,24 +6,24 @@ import android.app.KeyguardManager;
 import android.content.Context;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
-import android.os.Handler;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.text.TextUtils;
 import android.util.Base64;
 
-import androidx.annotation.NonNull;
 import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.biometric.BiometricPrompt.AuthenticationCallback;
 import androidx.biometric.BiometricPrompt.PromptInfo;
 import androidx.fragment.app.FragmentActivity;
 
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.UiThreadUtil;
+import com.facebook.react.bridge.WritableMap;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -33,7 +33,6 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
@@ -58,23 +57,40 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 ReactApplicationContext reactApplicationContext = getReactApplicationContext();
-                FingerprintManager fingerprintManager = reactApplicationContext.getSystemService(FingerprintManager.class);
-                Boolean isHardwareDetected = fingerprintManager.isHardwareDetected();
-                Boolean hasFingerprints = fingerprintManager.hasEnrolledFingerprints();
+                BiometricManager biometricManager = BiometricManager.from(reactApplicationContext);
+                int canAuthenticate = biometricManager.canAuthenticate();
 
-                KeyguardManager keyguardManager = (KeyguardManager) reactApplicationContext.getSystemService(Context.KEYGUARD_SERVICE);
-                Boolean hasProtectedLockscreen = keyguardManager.isKeyguardSecure();
-
-                if (isHardwareDetected && hasFingerprints && hasProtectedLockscreen) {
-                    promise.resolve("TouchID");
+                if (canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS) {
+                    WritableMap resultMap = Arguments.createMap();
+                    resultMap.putBoolean("available", true);
+                    resultMap.putString("biometryType", "biometrics");
+                    promise.resolve(resultMap);
                 } else {
-                    promise.resolve(null);
+                    WritableMap resultMap = Arguments.createMap();
+                    resultMap.putBoolean("available", false);
+
+                    switch (canAuthenticate) {
+                        case BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE:
+                            resultMap.putString("error", "BIOMETRIC_ERROR_NO_HARDWARE");
+                            break;
+                        case BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE:
+                            resultMap.putString("error", "BIOMETRIC_ERROR_HW_UNAVAILABLE");
+                            break;
+                        case BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED:
+                            resultMap.putString("error", "BIOMETRIC_ERROR_NONE_ENROLLED");
+                            break;
+                    }
+
+                    promise.resolve(resultMap);
                 }
             } else {
-                promise.resolve(null);
+                WritableMap resultMap = Arguments.createMap();
+                resultMap.putBoolean("available", false);
+                resultMap.putString("error", "UNSUPPORTED_ANDROID_VERSION");
+                promise.resolve(resultMap);
             }
         } catch (Exception e) {
-            promise.reject("Error detecting fingerprint availability: " + e.getMessage(), "Error detecting fingerprint availability");
+            promise.reject("Error detecting biometrics availability: " + e.getMessage(), "Error detecting biometrics availability");
         }
     }
 
