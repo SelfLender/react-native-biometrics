@@ -6,15 +6,24 @@ import android.app.KeyguardManager;
 import android.content.Context;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
+import android.os.Handler;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.text.TextUtils;
 import android.util.Base64;
 
+import androidx.annotation.NonNull;
+import androidx.biometric.BiometricManager;
+import androidx.biometric.BiometricPrompt;
+import androidx.biometric.BiometricPrompt.AuthenticationCallback;
+import androidx.biometric.BiometricPrompt.PromptInfo;
+import androidx.fragment.app.FragmentActivity;
+
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.UiThreadUtil;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -23,6 +32,9 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.spec.RSAKeyGenParameterSpec;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by brandon on 4/5/18.
@@ -131,13 +143,26 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void simplePrompt(String title, Promise promise) {
+    public void simplePrompt(final String title, final Promise promise) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                ReactNativeBiometricsDialog dialog = new ReactNativeBiometricsDialog();
-                dialog.init(title, null, getSimplePromptCallback(promise));
-                Activity activity = getCurrentActivity();
-                dialog.show(activity.getFragmentManager(), "fingerprint_dialog");
+                UiThreadUtil.runOnUiThread(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                AuthenticationCallback authCallback = new SimplePromptCallback(promise);
+                                FragmentActivity fragmentActivity = (FragmentActivity) getCurrentActivity();
+                                Executor executor = Executors.newSingleThreadExecutor();
+                                BiometricPrompt biometricPrompt = new BiometricPrompt(fragmentActivity, executor, authCallback);
+
+                                PromptInfo promptInfo = new PromptInfo.Builder()
+                                        .setDeviceCredentialAllowed(false)
+                                        .setNegativeButtonText("Cancel")
+                                        .setTitle(title)
+                                        .build();
+                                biometricPrompt.authenticate(promptInfo);
+                            }
+                        });
             } else {
                 promise.reject("Cannot display biometric prompt on android versions below 6.0", "Cannot display biometric prompt on android versions below 6.0");
             }
@@ -223,25 +248,6 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                 } catch (Exception e) {
                     promise.reject("Error generating public private keys: " + e.getMessage(), "Error generating public private keys");
                 }
-            }
-
-            @Override
-            public void onCancel() {
-                promise.reject("User cancelled fingerprint authorization", "User cancelled fingerprint authorization");
-            }
-
-            @Override
-            public void onError() {
-                promise.reject("Error generating public private keys" , "Error generating public private keys");
-            }
-        };
-    }
-
-    protected ReactNativeBiometricsCallback getSimplePromptCallback(final Promise promise) {
-        return new ReactNativeBiometricsCallback() {
-            @Override
-            public void onAuthenticated(FingerprintManager.CryptoObject cryptoObject) {
-                promise.resolve(true);
             }
 
             @Override
