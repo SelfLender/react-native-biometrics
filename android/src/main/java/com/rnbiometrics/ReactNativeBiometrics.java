@@ -16,6 +16,7 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.UiThreadUtil;
 import com.facebook.react.bridge.WritableMap;
 
@@ -132,13 +133,17 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void createSignature(final String title, final String payload, final Promise promise) {
+    public void createSignature(final ReadableMap params, final Promise promise) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             UiThreadUtil.runOnUiThread(
                     new Runnable() {
                         @Override
                         public void run() {
                             try {
+                                String cancelButtomText = params.getString("cancelButtonText");
+                                String promptMessage = params.getString("promptMessage");
+                                String payload = params.getString("payload");
+
                                 Signature signature = Signature.getInstance("SHA256withRSA");
                                 KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
                                 keyStore.load(null);
@@ -155,8 +160,8 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
 
                                 PromptInfo promptInfo = new PromptInfo.Builder()
                                         .setDeviceCredentialAllowed(false)
-                                        .setNegativeButtonText("Cancel")
-                                        .setTitle(title)
+                                        .setNegativeButtonText(cancelButtomText)
+                                        .setTitle(promptMessage)
                                         .build();
                                 biometricPrompt.authenticate(promptInfo, cryptoObject);
                             } catch (Exception e) {
@@ -170,13 +175,16 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void simplePrompt(final String title, final Promise promise) {
+    public void simplePrompt(final ReadableMap params, final Promise promise) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             UiThreadUtil.runOnUiThread(
                     new Runnable() {
                         @Override
                         public void run() {
                             try {
+                                String cancelButtomText = params.getString("cancelButtonText");
+                                String promptMessage = params.getString("promptMessage");
+
                                 AuthenticationCallback authCallback = new SimplePromptCallback(promise);
                                 FragmentActivity fragmentActivity = (FragmentActivity) getCurrentActivity();
                                 Executor executor = Executors.newSingleThreadExecutor();
@@ -184,8 +192,8 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
 
                                 PromptInfo promptInfo = new PromptInfo.Builder()
                                         .setDeviceCredentialAllowed(false)
-                                        .setNegativeButtonText("Cancel")
-                                        .setTitle(title)
+                                        .setNegativeButtonText(cancelButtomText)
+                                        .setTitle(promptMessage)
                                         .build();
                                 biometricPrompt.authenticate(promptInfo);
                             } catch (Exception e) {
