@@ -144,8 +144,11 @@ RCT_EXPORT_METHOD(simplePrompt: (NSString *)promptMessage resolver:(RCTPromiseRe
     [context evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics localizedReason:promptMessage reply:^(BOOL success, NSError *fingerprintError) {
       if (success) {
         resolve(@(YES));
+      } else if (fingerprintError.code == LAErrorUserCancel) {
+        resolve(@(NO));
       } else {
-        reject(@"fingerprint_error", @"Could not confirm fingerprint", nil);
+        NSString *message = [NSString stringWithFormat:@"%@", fingerprintError];
+        reject(@"fingerprint_error", message, nil);
       }
     }];
   });

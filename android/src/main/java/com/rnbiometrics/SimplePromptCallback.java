@@ -16,7 +16,11 @@ public class SimplePromptCallback extends BiometricPrompt.AuthenticationCallback
     @Override
     public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
         super.onAuthenticationError(errorCode, errString);
-        this.promise.reject("Error authenticating biometrics" , "Error authenticating biometrics");
+        if (errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON) {
+            this.promise.resolve(false);
+        } else {
+            this.promise.reject(errString.toString(), errString.toString());
+        }
     }
 
     @Override
