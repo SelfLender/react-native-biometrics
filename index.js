@@ -29,6 +29,16 @@ export default {
   createKeys: (promptMessage) => {
     return ReactNativeBiometrics.createKeys(promptMessage)
   },
+
+  /**
+   * Returns promise that resolves to true or false indicating if the keys
+   * were found to exists or not
+   * @returns {Promise} Promise that resolves to true or false
+   */
+  biometricKeyExists: () => {
+    return ReactNativeBiometrics.biometricKeyExists()
+  },
+
   /**
    * Returns promise that resolves to true or false indicating if the keys
    * were properly deleted

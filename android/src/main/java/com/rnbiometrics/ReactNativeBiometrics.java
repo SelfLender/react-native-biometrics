@@ -118,7 +118,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void deleteKeys(Promise promise) {
-        if (biometricKeyExists()) {
+        if (doesBiometricKeyExist()) {
             boolean deletionSuccessful = deleteBiometricKey();
 
             if (deletionSuccessful) {
@@ -198,7 +198,17 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
         }
     }
 
-    protected boolean biometricKeyExists() {
+    @ReactMethod
+    public void biometricKeyExists(Promise promise) {
+        try {
+            boolean doesBiometricKeyExist = doesBiometricKeyExist();
+            promise.resolve(doesBiometricKeyExist);
+        } catch (Exception e) {
+            promise.reject("Error checking if biometric key exists", "Error checking if biometric key exists");
+        }
+    }
+
+    protected boolean doesBiometricKeyExist() {
       try {
         KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
         keyStore.load(null);
