@@ -16,11 +16,25 @@ RCT_EXPORT_MODULE(ReactNativeBiometrics);
 RCT_EXPORT_METHOD(isSensorAvailable:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
   LAContext *context = [[LAContext alloc] init];
+  NSError *la_error = nil;
+  BOOL canEvaluatePolicy = [context canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&la_error];
 
-  if ([context canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:NULL]) {
-    resolve([self getBiometryType:context]);
+  if (canEvaluatePolicy) {
+    NSString *biometryType = [self getBiometryType:context];
+    NSDictionary *result = @{
+      @"available": @(YES),
+      @"biometryType": biometryType
+    };
+
+    resolve(result);
   } else {
-    resolve(Nil);
+    NSString *errorMessage = [NSString stringWithFormat:@"%@", la_error];
+    NSDictionary *result = @{
+      @"available": @(NO),
+      @"error": errorMessage
+    };
+
+    resolve(result);
   }
 }
 
@@ -130,14 +144,14 @@ RCT_EXPORT_METHOD(simplePrompt: (NSDictionary *)params resolver:(RCTPromiseResol
     LAContext *context = [[LAContext alloc] init];
     context.localizedFallbackTitle = @"";
 
-    [context evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics localizedReason:promptMessage reply:^(BOOL success, NSError *fingerprintError) {
+    [context evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics localizedReason:promptMessage reply:^(BOOL success, NSError *biometricError) {
       if (success) {
         resolve(@(YES));
-      } else if (fingerprintError.code == LAErrorUserCancel) {
+      } else if (biometricError.code == LAErrorUserCancel) {
         resolve(@(NO));
       } else {
-        NSString *message = [NSString stringWithFormat:@"%@", fingerprintError];
-        reject(@"fingerprint_error", message, nil);
+        NSString *message = [NSString stringWithFormat:@"%@", biometricError];
+        reject(@"biometric_error", message, nil);
       }
     }];
   });
