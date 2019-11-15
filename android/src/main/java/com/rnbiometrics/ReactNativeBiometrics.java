@@ -57,7 +57,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                 if (canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS) {
                     WritableMap resultMap = Arguments.createMap();
                     resultMap.putBoolean("available", true);
-                    resultMap.putString("biometryType", "biometrics");
+                    resultMap.putString("biometryType", "Biometrics");
                     promise.resolve(resultMap);
                 } else {
                     WritableMap resultMap = Arguments.createMap();
@@ -80,7 +80,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
             } else {
                 WritableMap resultMap = Arguments.createMap();
                 resultMap.putBoolean("available", false);
-                resultMap.putString("error", "UNSUPPORTED_ANDROID_VERSION");
+                resultMap.putString("error", "Unsupported android version");
                 promise.resolve(resultMap);
             }
         } catch (Exception e) {
@@ -89,7 +89,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void createKeys(String title, Promise promise) {
+    public void createKeys(Promise promise) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 deleteBiometricKey();
