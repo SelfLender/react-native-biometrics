@@ -1,6 +1,6 @@
 {
   "name": "react-native-biometrics",
-  "version": "1.7.0",
+  "version": "2.0.0",
   "summary": "A React Native library for biometrics",
   "description": "React Native biometric functionality for signing and encryption",
   "main": "lib/index.js",
@@ -34,7 +34,7 @@
   },
   "license": "MIT",
   "peerDependencies": {
-    "react-native": ">=0.52.0"
+    "react-native": ">=0.60.0"
   },
   "bugs": {
     "url": "https://github.com/SelfLender/react-native-biometrics/issues"
