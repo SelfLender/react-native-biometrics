@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.biometric.BiometricPrompt;
 
 import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeMap;
 
 import java.security.Signature;
 
@@ -22,7 +24,15 @@ public class CreateSignatureCallback extends BiometricPrompt.AuthenticationCallb
     @Override
     public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
         super.onAuthenticationError(errorCode, errString);
-        this.promise.reject("Error authenticating biometrics" , "Error authenticating biometrics");
+        super.onAuthenticationError(errorCode, errString);
+        if (errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON) {
+            WritableMap resultMap = new WritableNativeMap();
+            resultMap.putBoolean("success", false);
+            resultMap.putString("error", "User cancellation");
+            this.promise.resolve(resultMap);
+        } else {
+            this.promise.reject(errString.toString(), errString.toString());
+        }
     }
 
     @Override
@@ -36,7 +46,11 @@ public class CreateSignatureCallback extends BiometricPrompt.AuthenticationCallb
             byte[] signed = cryptoSignature.sign();
             String signedString = Base64.encodeToString(signed, Base64.DEFAULT);
             signedString = signedString.replaceAll("\r", "").replaceAll("\n", "");
-            promise.resolve(signedString);
+
+            WritableMap resultMap = new WritableNativeMap();
+            resultMap.putBoolean("success", true);
+            resultMap.putString("signature", signedString);
+            promise.resolve(resultMap);
         } catch (Exception e) {
             promise.reject("Error creating signature: " + e.getMessage(), "Error creating signature");
         }

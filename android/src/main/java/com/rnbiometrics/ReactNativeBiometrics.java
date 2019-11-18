@@ -11,7 +11,6 @@ import androidx.biometric.BiometricPrompt.AuthenticationCallback;
 import androidx.biometric.BiometricPrompt.PromptInfo;
 import androidx.fragment.app.FragmentActivity;
 
-import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -19,6 +18,7 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.UiThreadUtil;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeMap;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -56,12 +56,12 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                 int canAuthenticate = biometricManager.canAuthenticate();
 
                 if (canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS) {
-                    WritableMap resultMap = Arguments.createMap();
+                    WritableMap resultMap = new WritableNativeMap();
                     resultMap.putBoolean("available", true);
                     resultMap.putString("biometryType", "Biometrics");
                     promise.resolve(resultMap);
                 } else {
-                    WritableMap resultMap = Arguments.createMap();
+                    WritableMap resultMap = new WritableNativeMap();
                     resultMap.putBoolean("available", false);
 
                     switch (canAuthenticate) {
@@ -79,7 +79,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                     promise.resolve(resultMap);
                 }
             } else {
-                WritableMap resultMap = Arguments.createMap();
+                WritableMap resultMap = new WritableNativeMap();
                 resultMap.putBoolean("available", false);
                 resultMap.putString("error", "Unsupported android version");
                 promise.resolve(resultMap);
@@ -108,7 +108,10 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                 byte[] encodedPublicKey = publicKey.getEncoded();
                 String publicKeyString = Base64.encodeToString(encodedPublicKey, Base64.DEFAULT);
                 publicKeyString = publicKeyString.replaceAll("\r", "").replaceAll("\n", "");
-                promise.resolve(publicKeyString);
+
+                WritableMap resultMap = new WritableNativeMap();
+                resultMap.putString("publicKey", publicKeyString);
+                promise.resolve(resultMap);
             } else {
                 promise.reject("Cannot generate keys on android versions below 6.0", "Cannot generate keys on android versions below 6.0");
             }
@@ -123,12 +126,16 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
             boolean deletionSuccessful = deleteBiometricKey();
 
             if (deletionSuccessful) {
-                promise.resolve(true);
+                WritableMap resultMap = new WritableNativeMap();
+                resultMap.putBoolean("keysDeleted", true);
+                promise.resolve(resultMap);
             } else {
                 promise.reject("Error deleting biometric key from keystore", "Error deleting biometric key from keystore");
             }
         } else {
-            promise.resolve(false);
+            WritableMap resultMap = new WritableNativeMap();
+            resultMap.putBoolean("keysDeleted", false);
+            promise.resolve(resultMap);
         }
     }
 
@@ -207,10 +214,12 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void biometricKeyExists(Promise promise) {
+    public void biometricKeysExist(Promise promise) {
         try {
             boolean doesBiometricKeyExist = doesBiometricKeyExist();
-            promise.resolve(doesBiometricKeyExist);
+            WritableMap resultMap = new WritableNativeMap();
+            resultMap.putBoolean("keysExist", doesBiometricKeyExist);
+            promise.resolve(resultMap);
         } catch (Exception e) {
             promise.reject("Error checking if biometric key exists", "Error checking if biometric key exists");
         }

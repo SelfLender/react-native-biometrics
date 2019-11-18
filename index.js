@@ -40,8 +40,8 @@ export default {
    * were found to exists or not
    * @returns {Promise} Promise that resolves to true or false
    */
-  biometricKeyExists: () => {
-    return ReactNativeBiometrics.biometricKeyExists()
+  biometricKeysExist: () => {
+    return ReactNativeBiometrics.biometricKeysExist()
   },
 
   /**

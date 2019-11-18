@@ -74,7 +74,11 @@ RCT_EXPORT_METHOD(createKeys: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromi
       NSData *publicKeyData = (__bridge NSData *)publicKeyDataRef;
       NSData *publicKeyDataWithHeader = [self addHeaderPublickey:publicKeyData];
       NSString *publicKeyString = [publicKeyDataWithHeader base64EncodedStringWithOptions:0];
-      resolve(publicKeyString);
+
+      NSDictionary *result = @{
+        @"publicKey": publicKeyString,
+      };
+      resolve(result);
     } else {
       NSString *message = [NSString stringWithFormat:@"Key generation error: %@", gen_error];
       reject(@"storage_error", message, nil);
@@ -90,13 +94,19 @@ RCT_EXPORT_METHOD(deleteKeys: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromi
       OSStatus status = [self deleteBiometricKey];
 
       if (status == noErr) {
-        resolve(@(YES));
+        NSDictionary *result = @{
+          @"keysDeleted": @(YES),
+        };
+        resolve(result);
       } else {
         NSString *message = [NSString stringWithFormat:@"Key not found: %@",[self keychainErrorToString:status]];
         reject(@"deletion_error", message, nil);
       }
     } else {
-        resolve(@(NO));
+        NSDictionary *result = @{
+          @"keysDeleted": @(NO),
+        };
+        resolve(result);
     }
   });
 }
@@ -124,13 +134,22 @@ RCT_EXPORT_METHOD(createSignature: (NSDictionary *)params resolver:(RCTPromiseRe
 
       if (signature != nil) {
         NSString *signatureString = [signature base64EncodedStringWithOptions:0];
-        resolve(signatureString);
+        NSDictionary *result = @{
+          @"success": @(YES),
+          @"signature": signatureString
+        };
+        resolve(result);
+      } else if (error.code == errSecUserCanceled) {
+        NSDictionary *result = @{
+          @"success": @(NO),
+          @"error": @"User cancellation"
+        };
+        resolve(result);
       } else {
         NSString *message = [NSString stringWithFormat:@"Signature error: %@", error];
         reject(@"signature_error", message, nil);
       }
-    }
-    else {
+    } else {
       NSString *message = [NSString stringWithFormat:@"Key not found: %@",[self keychainErrorToString:status]];
       reject(@"storage_error", message, nil);
     }
@@ -146,9 +165,16 @@ RCT_EXPORT_METHOD(simplePrompt: (NSDictionary *)params resolver:(RCTPromiseResol
 
     [context evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics localizedReason:promptMessage reply:^(BOOL success, NSError *biometricError) {
       if (success) {
-        resolve(@(YES));
+        NSDictionary *result = @{
+          @"success": @(YES)
+        };
+        resolve(result);
       } else if (biometricError.code == LAErrorUserCancel) {
-        resolve(@(NO));
+        NSDictionary *result = @{
+          @"success": @(NO),
+          @"error": @"User cancellation"
+        };
+        resolve(result);
       } else {
         NSString *message = [NSString stringWithFormat:@"%@", biometricError];
         reject(@"biometric_error", message, nil);
@@ -157,14 +183,20 @@ RCT_EXPORT_METHOD(simplePrompt: (NSDictionary *)params resolver:(RCTPromiseResol
   });
 }
 
-RCT_EXPORT_METHOD(biometricKeyExists: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_METHOD(biometricKeysExist: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     BOOL biometricKeyExists = [self doesBiometricKeyExist];
 
     if (biometricKeyExists) {
-      resolve(@(YES));
+      NSDictionary *result = @{
+        @"keysExist": @(YES)
+      };
+      resolve(result);
     } else {
-      resolve(@(NO));
+      NSDictionary *result = @{
+        @"keysExist": @(NO)
+      };
+      resolve(result);
     }
   });
 }
