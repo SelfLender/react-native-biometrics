@@ -55,6 +55,8 @@ __Example__
 ```js
 import ReactNativeBiometrics from 'react-native-biometrics'
 
+const { biometryType } = await ReactNativeBiometrics.isSensorAvailable()
+
 if (biometryType === ReactNativeBiometrics.TouchID) {
   //do something fingerprint specific
 }
@@ -68,6 +70,8 @@ __Example__
 
 ```js
 import ReactNativeBiometrics from 'react-native-biometrics'
+
+const { biometryType } = await ReactNativeBiometrics.isSensorAvailable()
 
 if (biometryType === ReactNativeBiometrics.FaceID) {
   //do something face id specific
@@ -83,7 +87,9 @@ __Example__
 ```js
 import ReactNativeBiometrics from 'react-native-biometrics'
 
-if (biometryType === ReactNativeBiometrics.FaceID) {
+const { biometryType } = await ReactNativeBiometrics.isSensorAvailable()
+
+if (biometryType === ReactNativeBiometrics.Biometrics) {
   //do something face id specific
 }
 ```
@@ -99,8 +105,8 @@ __Result Object__
 | Property | Type | Description |
 | --- | --- | --- |
 | available | bool | A boolean indicating if biometrics is available or not |
-| biometryType | string | A string indicating what type of biometrics is available. `TouchID`, `FaceId`, or `Biometrics` |
-| error | string | An error message indicating why biometrics may not be available |
+| biometryType | string | A string indicating what type of biometrics is available. `TouchID`, `FaceID`, `Biometrics`, or `undefined` if biometrics is not available. |
+| error | string | An error message indicating why biometrics may not be available. `undefined` if there is no error. |
 
 __Example__
 
@@ -219,8 +225,8 @@ __Result Object__
 | Property | Type | Description |
 | --- | --- | --- |
 | success | bool | A boolean indicating if the process was successful, `false` if the users cancels the biometrics prompt |
-| signature | string | A base64 encoded string representing the signature |
-| error | string | An error message indicating reasons why signature creation failed |
+| signature | string | A base64 encoded string representing the signature. `undefined` if the process was not successful. |
+| error | string | An error message indicating reasons why signature creation failed. `undefined` if there is no error. |
 
 __Example__
 
@@ -262,7 +268,7 @@ __Result Object__
 | Property | Type | Description |
 | --- | --- | --- |
 | success | bool | A boolean indicating if the biometric prompt succeeded, `false` if the users cancels the biometrics prompt |
-| error | string | An error message indicating why the biometric prompt failed |
+| error | string | An error message indicating why the biometric prompt failed. `undefined` if there is no error. |
 
 __Example__
 
