@@ -85,7 +85,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                 promise.resolve(resultMap);
             }
         } catch (Exception e) {
-            promise.reject("Error detecting biometrics availability: " + e.getMessage(), "Error detecting biometrics availability");
+            promise.reject("Error detecting biometrics availability: " + e.getMessage(), "Error detecting biometrics availability: " + e.getMessage());
         }
     }
 
@@ -172,7 +172,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                                         .build();
                                 biometricPrompt.authenticate(promptInfo, cryptoObject);
                             } catch (Exception e) {
-                                promise.reject("Error signing payload: " + e.getMessage(), "Error generating signature");
+                                promise.reject("Error signing payload: " + e.getMessage(), "Error generating signature: " + e.getMessage());
                             }
                         }
                     });
@@ -204,7 +204,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                                         .build();
                                 biometricPrompt.authenticate(promptInfo);
                             } catch (Exception e) {
-                                promise.reject("Error displaying local biometric prompt: " + e.getMessage(), "Error displaying local biometric prompt");
+                                promise.reject("Error displaying local biometric prompt: " + e.getMessage(), "Error displaying local biometric prompt: " + e.getMessage());
                             }
                         }
                     });
@@ -221,7 +221,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
             resultMap.putBoolean("keysExist", doesBiometricKeyExist);
             promise.resolve(resultMap);
         } catch (Exception e) {
-            promise.reject("Error checking if biometric key exists", "Error checking if biometric key exists");
+            promise.reject("Error checking if biometric key exists: " + e.getMessage(), "Error checking if biometric key exists: " + e.getMessage());
         }
     }
 
