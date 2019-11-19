@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.license        = package['license']
   s.homepage       = package['homepage']
   s.source         = { :git => 'https://github.com/SelfLender/react-native-biometrics.git', :tag => "#{s.version}" }
-  s.platform       = :ios, '9.0'
+  s.platform       = :ios, '10.0'
   s.source_files   = 'ios/**/*.{h,m}'
   s.dependency     'React'
 end

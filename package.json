@@ -1,14 +1,13 @@
 {
   "name": "react-native-biometrics",
-  "version": "1.7.0",
+  "version": "2.0.0",
   "summary": "A React Native library for biometrics",
   "description": "React Native biometric functionality for signing and encryption",
-  "main": "lib/index.js",
+  "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
     "clean": "rm -rf lib && rm -rf node_modules && npm install",
-    "build": "babel index.js -d lib",
-    "release": "npm run clean && npm run build && npm publish"
+    "release": "npm run clean && npm publish"
   },
   "keywords": [
     "react-native",
@@ -34,14 +33,10 @@
   },
   "license": "MIT",
   "peerDependencies": {
-    "react-native": ">=0.52.0"
+    "react-native": ">=0.60.0"
   },
   "bugs": {
     "url": "https://github.com/SelfLender/react-native-biometrics/issues"
   },
-  "devDependencies": {
-    "@babel/cli": "^7.5.5",
-    "@babel/core": "^7.5.5",
-    "metro-react-native-babel-preset": "^0.56.0"
-  }
+  "devDependencies": {}
 }

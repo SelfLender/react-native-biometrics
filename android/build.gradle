@@ -2,10 +2,10 @@ apply plugin: 'com.android.library'
 
 description = 'react-native-biometrics'
 
-def DEFAULT_COMPILE_SDK_VERSION             = 28
-def DEFAULT_BUILD_TOOLS_VERSION             = "28.0.3"
+def DEFAULT_COMPILE_SDK_VERSION             = 29
+def DEFAULT_BUILD_TOOLS_VERSION             = "29.0.2"
 def DEFAULT_MIN_SDK_VERSION                 = 16
-def DEFAULT_TARGET_SDK_VERSION              = 28
+def DEFAULT_TARGET_SDK_VERSION              = 29
 
 buildscript {
     repositories {
@@ -14,7 +14,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath 'com.android.tools.build:gradle:3.4.2'
     }
 }
 
@@ -37,5 +37,6 @@ repositories {
 }
 
 dependencies {
+    implementation 'androidx.biometric:biometric:1.0.0'
     implementation 'com.facebook.react:react-native:+'
 }
