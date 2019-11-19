@@ -212,11 +212,12 @@ RCT_EXPORT_METHOD(biometricKeysExist: (RCTPromiseResolveBlock)resolve rejecter:(
   NSDictionary *searchQuery = @{
                                 (id)kSecClass: (id)kSecClassKey,
                                 (id)kSecAttrApplicationTag: biometricKeyTag,
-                                (id)kSecAttrKeyType: (id)kSecAttrKeyTypeRSA
+                                (id)kSecAttrKeyType: (id)kSecAttrKeyTypeRSA,
+                                (id)kSecUseAuthenticationUI: (id)kSecUseAuthenticationUIFail
                                 };
 
   OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)searchQuery, nil);
-  return status == errSecSuccess;
+  return status == errSecSuccess || status == errSecInteractionNotAllowed;
 }
 
 -(OSStatus) deleteBiometricKey {
