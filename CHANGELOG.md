@@ -1,6 +1,19 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] - 2019-11-19
+### Breaking
+- Requires React Native 0.60+ for androidx compatibility
+- All functions now take an options object and return a result object
+- `createSignature` no longer prompts user for biometrics, `simplePrompt` can be used in conjunction with it to achieve the same effect
+- `createSignature` and `simplePrompt` no longer reject on cancellation, they resolve with a success flag set to false when a user cancels a biometric prompt
+- Android no longer resolves to biometry type of `TouchID`, it only resolves to `Biometrics`
+### Changed
+- Used android BiometricPrompt API for biometrics
+- Changed library function API
+- Added better support for prompt cancellations
+- Started to return native error messages in promise rejections
+
 ## [1.7.0] - 2019-11-5
 ### Changed
 - Removed dependency on android app compat library for compatibility with androidx
@@ -97,3 +110,4 @@ All notable changes to this project will be documented in this file.
 [1.6.0]: https://github.com/SelfLender/react-native-biometrics/compare/1.5.2...1.6.0
 [1.6.1]: https://github.com/SelfLender/react-native-biometrics/compare/1.6.0...1.6.1
 [1.7.0]: https://github.com/SelfLender/react-native-biometrics/compare/1.6.1...1.7.0
+[2.0.0]: https://github.com/SelfLender/react-native-biometrics/compare/1.7.0...2.0.0
