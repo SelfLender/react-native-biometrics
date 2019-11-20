@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "target": "es5",
+    "declaration": true,
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "outDir": "build",
+    "lib": ["es2015", "es2015.promise"]
+  },
+  "include": [
+    "index.ts",
+    "modules.d.ts"
+  ]
+}
