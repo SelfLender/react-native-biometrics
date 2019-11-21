@@ -1,13 +1,13 @@
 {
   "name": "react-native-biometrics",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "summary": "A React Native library for biometrics",
   "description": "React Native biometric functionality for signing and encryption",
   "main": "build/cjs/index.js",
   "module": "build/esm/index.js",
   "types": "build/esm/index.d.ts",
   "scripts": {
-    "clean": "rm -rf lib && rm -rf node_modules && npm install",
+    "clean": "rm -rf build && rm -rf node_modules && npm install",
     "build": "npm run build:cjs && npm run build:esm",
     "build:cjs": "tsc --target es5 --outDir build/cjs --module commonjs",
     "build:esm": "tsc --target es5 --outDir build/esm --module esnext",

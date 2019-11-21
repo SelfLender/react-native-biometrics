@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2.1.0] - 2019-11-20
+## Changed
+- Refactored the javascript portion of the library into typescript
+
 ## [2.0.0] - 2019-11-19
 ### Breaking
 - Requires React Native 0.60+ for androidx compatibility
@@ -111,3 +115,4 @@ All notable changes to this project will be documented in this file.
 [1.6.1]: https://github.com/SelfLender/react-native-biometrics/compare/1.6.0...1.6.1
 [1.7.0]: https://github.com/SelfLender/react-native-biometrics/compare/1.6.1...1.7.0
 [2.0.0]: https://github.com/SelfLender/react-native-biometrics/compare/1.7.0...2.0.0
+[2.1.0]: https://github.com/SelfLender/react-native-biometrics/compare/2.0.0...2.1.0
