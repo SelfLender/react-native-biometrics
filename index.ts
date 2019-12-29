@@ -2,9 +2,14 @@ import { NativeModules } from 'react-native';
 
 const { ReactNativeBiometrics: bridge } = NativeModules;
 
+/** 
+ * Type alias for possible biometry types
+ */
+export type BiometryType = 'TouchID' | 'FaceID' | 'Biometrics';
+
 interface IsSensorAvailableResult {
     available: boolean
-    biometryType?: string
+    biometryType?: BiometryType
     error?: string
 }
 
