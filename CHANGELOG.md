@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2.1.2] - 2019-12-29
+## Changed
+- Improved biometryType typescript definition
+
 ## [2.1.1] - 2019-11-20
 ## Changed
 - Fixed npm release error
@@ -121,3 +125,4 @@ All notable changes to this project will be documented in this file.
 [2.0.0]: https://github.com/SelfLender/react-native-biometrics/compare/1.7.0...2.0.0
 [2.1.0]: https://github.com/SelfLender/react-native-biometrics/compare/2.0.0...2.1.0
 [2.1.1]: https://github.com/SelfLender/react-native-biometrics/compare/2.1.0...2.1.1
+[2.1.2]: https://github.com/SelfLender/react-native-biometrics/compare/2.1.1...2.1.2
