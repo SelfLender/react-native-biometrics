@@ -275,7 +275,7 @@ __Example__
 ```js
 import ReactNativeBiometrics from 'react-native-biometrics'
 
-ReactNativeBiometrics.simplePrompt('Confirm fingerprint')
+ReactNativeBiometrics.simplePrompt({promptMessage: 'Confirm fingerprint'})
   .then((resultObject) => {
     const { success } = resultObject
 
