@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2.1.3] - 2020-01-27
+## Changed
+- Fixed readme typo
+- Improved android prompt cancellation handling
+
 ## [2.1.2] - 2019-12-29
 ## Changed
 - Improved biometryType typescript definition
@@ -126,3 +131,4 @@ All notable changes to this project will be documented in this file.
 [2.1.0]: https://github.com/SelfLender/react-native-biometrics/compare/2.0.0...2.1.0
 [2.1.1]: https://github.com/SelfLender/react-native-biometrics/compare/2.1.0...2.1.1
 [2.1.2]: https://github.com/SelfLender/react-native-biometrics/compare/2.1.1...2.1.2
+[2.1.3]: https://github.com/SelfLender/react-native-biometrics/compare/2.1.2...2.1.3
