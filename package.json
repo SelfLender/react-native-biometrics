@@ -10,6 +10,9 @@
     "build": "babel index.js -d lib",
     "release": "npm run clean && npm run build && npm publish"
   },
+  "publishConfig": {
+    "tag": "old"
+  },
   "keywords": [
     "react-native",
     "android",
