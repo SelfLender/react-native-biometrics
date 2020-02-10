@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [1.7.1] - 2020-02-10
+### Changed
+- Prevented ios prompt from displaying when checking for key existence
+
 ## [1.7.0] - 2019-11-5
 ### Changed
 - Removed dependency on android app compat library for compatibility with androidx
@@ -97,3 +101,4 @@ All notable changes to this project will be documented in this file.
 [1.6.0]: https://github.com/SelfLender/react-native-biometrics/compare/1.5.2...1.6.0
 [1.6.1]: https://github.com/SelfLender/react-native-biometrics/compare/1.6.0...1.6.1
 [1.7.0]: https://github.com/SelfLender/react-native-biometrics/compare/1.6.1...1.7.0
+[1.7.1]: https://github.com/SelfLender/react-native-biometrics/compare/1.7.0...1.7.1
