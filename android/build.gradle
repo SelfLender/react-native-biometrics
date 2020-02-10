@@ -37,6 +37,6 @@ repositories {
 }
 
 dependencies {
-    implementation 'androidx.biometric:biometric:1.0.0'
+    implementation 'androidx.biometric:biometric:1.0.1'
     implementation 'com.facebook.react:react-native:+'
 }
