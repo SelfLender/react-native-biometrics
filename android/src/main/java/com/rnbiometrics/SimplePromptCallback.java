@@ -24,7 +24,7 @@ public class SimplePromptCallback extends BiometricPrompt.AuthenticationCallback
             resultMap.putString("error", "User cancellation");
             this.promise.resolve(resultMap);
         } else {
-            this.promise.reject(errString.toString(), errString.toString());
+            this.promise.reject(Integer.toString(errorCode), errString.toString());
         }
     }
 
