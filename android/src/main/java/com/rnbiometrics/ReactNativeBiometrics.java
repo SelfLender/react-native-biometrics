@@ -190,6 +190,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                         public void run() {
                             try {
                                 String cancelButtomText = params.getString("cancelButtonText");
+                                Boolean allowDeviceCredentials = params.getBoolean("allowDeviceCredentials");
                                 String promptMessage = params.getString("promptMessage");
 
                                 AuthenticationCallback authCallback = new SimplePromptCallback(promise);
@@ -197,12 +198,21 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                                 Executor executor = Executors.newSingleThreadExecutor();
                                 BiometricPrompt biometricPrompt = new BiometricPrompt(fragmentActivity, executor, authCallback);
 
-                                PromptInfo promptInfo = new PromptInfo.Builder()
+                                if (allowDeviceCredentials) {
+                                    PromptInfo promptInfo = new PromptInfo.Builder()
+                                        .setTitle(promptMessage)
+                                        .setDeviceCredentialAllowed(true)
+                                        .build();
+                                    biometricPrompt.authenticate(promptInfo);
+                                } else {
+                                    PromptInfo promptInfo = new PromptInfo.Builder()
+                                        .setTitle(promptMessage)
                                         .setDeviceCredentialAllowed(false)
                                         .setNegativeButtonText(cancelButtomText)
-                                        .setTitle(promptMessage)
                                         .build();
-                                biometricPrompt.authenticate(promptInfo);
+                                    biometricPrompt.authenticate(promptInfo);
+                                }
+                                
                             } catch (Exception e) {
                                 promise.reject("Error displaying local biometric prompt: " + e.getMessage(), "Error displaying local biometric prompt: " + e.getMessage());
                             }
