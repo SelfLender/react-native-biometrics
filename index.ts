@@ -39,7 +39,8 @@ interface CreateSignatureResult {
 
 interface SimplePromptOptions {
     promptMessage: string
-    cancelButtonText?: string
+    cancelButtonText?: string,
+    allowDeviceCredentials?: boolean
 }
 
 interface SimplePromptResult {
@@ -120,11 +121,16 @@ module ReactNativeBiometrics {
      * @param {Object} simplePromptOptions
      * @param {string} simplePromptOptions.promptMessage
      * @param {string} simplePromptOptions.cancelButtonText (Android only)
+     * @param {string} simplePromptOptions.allowDeviceCredentials (Android only)
      * @returns {Promise<Object>}  Promise that resolves an object with details about the biometrics result
      */
     export function simplePrompt(simplePromptOptions: SimplePromptOptions): Promise<SimplePromptResult> {
         if (!simplePromptOptions.cancelButtonText) {
             simplePromptOptions.cancelButtonText = 'Cancel';
+        }
+
+        if (!simplePromptOptions.allowDeviceCredentials) {
+            simplePromptOptions.allowDeviceCredentials = false;
         }
 
         return bridge.simplePrompt(simplePromptOptions);

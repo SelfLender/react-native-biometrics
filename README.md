@@ -219,6 +219,7 @@ __Options Object__
 | promptMessage | string | Message that will be displayed in the fingerprint or face id prompt | ✔ | ✔ |
 | payload | string | String of data to be signed by the RSA signature | ✔ | ✔ |
 | cancelButtonText | string | Text to be displayed for the cancel button on biometric prompts, defaults to `Cancel` | ✖ | ✔ |
+| allowDeviceCredentials | boolean | If true, the user can use the device credential (pattern or pin code) | ✖ | ✔ |
 
 __Result Object__
 
