@@ -17,7 +17,7 @@ RCT_EXPORT_METHOD(isSensorAvailable:(RCTPromiseResolveBlock)resolve rejecter:(RC
 {
   LAContext *context = [[LAContext alloc] init];
   NSError *la_error = nil;
-  BOOL canEvaluatePolicy = [context canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&la_error];
+  BOOL canEvaluatePolicy = [context canEvaluatePolicy:LAPolicyDeviceOwnerAuthentication error:&la_error];
 
   if (canEvaluatePolicy) {
     NSString *biometryType = [self getBiometryType:context];
@@ -163,7 +163,7 @@ RCT_EXPORT_METHOD(simplePrompt: (NSDictionary *)params resolver:(RCTPromiseResol
     LAContext *context = [[LAContext alloc] init];
     context.localizedFallbackTitle = @"";
 
-    [context evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics localizedReason:promptMessage reply:^(BOOL success, NSError *biometricError) {
+    [context evaluatePolicy:LAPolicyDeviceOwnerAuthentication localizedReason:promptMessage reply:^(BOOL success, NSError *biometricError) {
       if (success) {
         NSDictionary *result = @{
           @"success": @(YES)
