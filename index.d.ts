@@ -1,4 +1,4 @@
-export default interface ReactNativeBiometrics {
+export interface ReactNativeBiometrics {
   /**
    * Enum for touch id sensor type
    */
@@ -18,7 +18,7 @@ export default interface ReactNativeBiometrics {
    * Returns promise that resolves to an object with object.biometryType = Biometrics | TouchID | FaceID
    * @returns {Promise<Object>} Promise that resolves to null, TouchID, or FaceID
    */
-  isSensorAvailable(): Promise<Object>;
+  isSensorAvailable(): Promise<{available: any, biometryType: any}>;
 
   /**
    * Creates a public private key pair,returns promise that resolves to
@@ -65,3 +65,6 @@ export default interface ReactNativeBiometrics {
    */
   simplePrompt(simplePromptOptions: Object): Promise<Object>;
 }
+
+declare const Biometrics: ReactNativeBiometrics;
+export default Biometrics;
