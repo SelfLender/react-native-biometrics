@@ -112,6 +112,7 @@ __Example__
 
 ```js
 import ReactNativeBiometrics from 'react-native-biometrics'
+import {Alert} from 'react-native';
 
 ReactNativeBiometrics.isSensorAvailable()
   .then((resultObject) => {
@@ -125,6 +126,23 @@ ReactNativeBiometrics.isSensorAvailable()
       console.log('Biometrics is supported')
     } else {
       console.log('Biometrics not supported')
+
+      // for iOS, since every iOS device has either TouchID or FaceID after iPhone5s
+      let message = 'Please go to settings to our app accessing your touch / face id';
+
+      // for android, check for different conditions
+      if (Platform.OS === 'android') {
+        if (error === ReactNativeBiometrics.BiometricErrorAndroid.NONE_ENROLLED) {
+          message = 'Please go to settings, and create your biometric credential';
+        } else if (error === ReactNativeBiometrics.BiometricErrorAndroid.NO_HARDWARE) {
+          message = 'No biometric features available on this device';
+        } else if (error === ReactNativeBiometrics.BiometricErrorAndroid.HW_UNAVAILBLE) {
+          message = 'Biometric features are currently unavailable';
+        }
+      }
+        
+      // hint the users about their next move
+      Alert.alert('Warning', message, [{text: 'Got it'}]);
     }
   })
 ```

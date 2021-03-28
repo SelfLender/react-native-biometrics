@@ -60,6 +60,14 @@ module ReactNativeBiometrics {
      * Enum for generic biometrics (this is the only value available on android)
      */
     export const Biometrics = 'Biometrics';
+    /**
+     * Enum for android's predefined error cases  
+     */
+    export const BiometricErrorAndroid = {
+        NO_HARDWARE: "BIOMETRIC_ERROR_NO_HARDWARE",
+        HW_UNAVAILBLE: "BIOMETRIC_ERROR_HW_UNAVAILABLE",
+        NONE_ENROLLED: "BIOMETRIC_ERROR_NONE_ENROLLED"
+    };
 
     /**
      * Returns promise that resolves to an object with object.biometryType = Biometrics | TouchID | FaceID
