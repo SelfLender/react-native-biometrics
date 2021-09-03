@@ -20,6 +20,10 @@ or npm:
 
 `$ npm install react-native-biometrics --save`
 
+### Install pods
+
+`$ npx pod-install`
+
 ### Link / Autolinking
 
 On React Native 0.60+ the [CLI autolink feature](https://github.com/react-native-community/cli/blob/master/docs/autolinking.md) links the module while building the app.
