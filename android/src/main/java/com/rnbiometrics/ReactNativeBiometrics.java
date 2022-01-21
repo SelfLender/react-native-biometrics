@@ -1,5 +1,10 @@
 package com.rnbiometrics;
 
+import static androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG;
+import static androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL;
+import static androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK;
+
+
 import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
@@ -55,13 +60,11 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                 BiometricManager biometricManager = BiometricManager.from(reactApplicationContext);
                 int canAuthenticate = biometricManager.canAuthenticate();
 
+                WritableMap resultMap = new WritableNativeMap();
                 if (canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS) {
-                    WritableMap resultMap = new WritableNativeMap();
                     resultMap.putBoolean("available", true);
                     resultMap.putString("biometryType", "Biometrics");
-                    promise.resolve(resultMap);
                 } else {
-                    WritableMap resultMap = new WritableNativeMap();
                     resultMap.putBoolean("available", false);
 
                     switch (canAuthenticate) {
@@ -76,8 +79,8 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                             break;
                     }
 
-                    promise.resolve(resultMap);
                 }
+                promise.resolve(resultMap);
             } else {
                 WritableMap resultMap = new WritableNativeMap();
                 resultMap.putBoolean("available", false);
@@ -182,7 +185,48 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void simplePrompt(final ReadableMap params, final Promise promise) {
+    public void biometricPrompt(final ReadableMap params, final Promise promise) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            UiThreadUtil.runOnUiThread(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                String cancelButtomText = params.getString("cancelButtonText");
+                                String promptMessage = params.getString("promptMessage");
+                                Boolean allowDeviceCredentials = params.getBoolean("allowDeviceCredentials");
+
+                                AuthenticationCallback authCallback = new SimplePromptCallback(promise);
+                                FragmentActivity fragmentActivity = (FragmentActivity) getCurrentActivity();
+                                Executor executor = Executors.newSingleThreadExecutor();
+                                BiometricPrompt biometricPrompt = new BiometricPrompt(fragmentActivity, executor, authCallback);
+
+                                PromptInfo promptInfo;
+                                if (allowDeviceCredentials) {
+                                    promptInfo = new PromptInfo.Builder()
+                                            .setTitle(promptMessage)
+                                            .setAllowedAuthenticators(BIOMETRIC_STRONG | DEVICE_CREDENTIAL)
+                                            .build();
+                                } else {
+                                    promptInfo = new PromptInfo.Builder()
+                                            .setTitle(promptMessage)
+                                            .setAllowedAuthenticators(BIOMETRIC_STRONG)
+                                            .setNegativeButtonText(cancelButtomText)
+                                            .build();
+                                }
+                                biometricPrompt.authenticate(promptInfo);
+                            } catch (Exception e) {
+                                promise.reject("Error displaying local biometric prompt: " + e.getMessage(), "Error displaying local biometric prompt: " + e.getMessage());
+                            }
+                        }
+                    });
+        } else {
+            promise.reject("Cannot display biometric prompt on android versions below 6.0", "Cannot display biometric prompt on android versions below 6.0");
+        }
+    }
+
+    @ReactMethod
+    public void deviceCredentialsPrompt(final ReadableMap params, final Promise promise) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             UiThreadUtil.runOnUiThread(
                     new Runnable() {
@@ -198,13 +242,13 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                                 BiometricPrompt biometricPrompt = new BiometricPrompt(fragmentActivity, executor, authCallback);
 
                                 PromptInfo promptInfo = new PromptInfo.Builder()
-                                        .setDeviceCredentialAllowed(false)
-                                        .setNegativeButtonText(cancelButtomText)
                                         .setTitle(promptMessage)
+                                        .setAllowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL)
                                         .build();
                                 biometricPrompt.authenticate(promptInfo);
+
                             } catch (Exception e) {
-                                promise.reject("Error displaying local biometric prompt: " + e.getMessage(), "Error displaying local biometric prompt: " + e.getMessage());
+                                promise.reject("Error displaying local device credentials prompt: " + e.getMessage(), "Error displaying local device credentials prompt: " + e.getMessage());
                             }
                         }
                     });
@@ -212,6 +256,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
             promise.reject("Cannot display biometric prompt on android versions below 6.0", "Cannot display biometric prompt on android versions below 6.0");
         }
     }
+
 
     @ReactMethod
     public void biometricKeysExist(Promise promise) {
