@@ -148,7 +148,7 @@ __Example__
 ```js
 import ReactNativeBiometrics from 'react-native-biometrics'
 
-ReactNativeBiometrics.createKeys('Confirm fingerprint')
+ReactNativeBiometrics.createKeys()
   .then((resultObject) => {
     const { publicKey } = resultObject
     console.log(publicKey)
