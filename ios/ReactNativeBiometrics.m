@@ -17,7 +17,7 @@ RCT_EXPORT_METHOD(isSensorAvailable:(RCTPromiseResolveBlock)resolve rejecter:(RC
 {
   LAContext *context = [[LAContext alloc] init];
   NSError *la_error = nil;
-  BOOL canEvaluatePolicy = [context canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&la_error];
+  BOOL canEvaluatePolicy = [context canEvaluatePolicy:LAPolicyDeviceOwnerAuthentication error:&la_error];
 
   if (canEvaluatePolicy) {
     NSString *biometryType = [self getBiometryType:context];
@@ -44,7 +44,7 @@ RCT_EXPORT_METHOD(createKeys: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromi
 
     SecAccessControlRef sacObject = SecAccessControlCreateWithFlags(kCFAllocatorDefault,
                                                                     kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly,
-                                                                    kSecAccessControlBiometryAny, &error);
+                                                                    kSecAccessControlUserPresence, &error);
     if (sacObject == NULL || error != NULL) {
       NSString *errorString = [NSString stringWithFormat:@"SecItemAdd can't create sacObject: %@", error];
       reject(@"storage_error", errorString, nil);
@@ -159,11 +159,12 @@ RCT_EXPORT_METHOD(createSignature: (NSDictionary *)params resolver:(RCTPromiseRe
 RCT_EXPORT_METHOD(simplePrompt: (NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     NSString *promptMessage = [RCTConvert NSString:params[@"promptMessage"]];
+    NSString *fallbackPromptMessage = [RCTConvert NSString:params[@"fallbackPromptMessage"]];
 
     LAContext *context = [[LAContext alloc] init];
-    context.localizedFallbackTitle = @"";
+    context.localizedFallbackTitle = fallbackPromptMessage;
 
-    [context evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics localizedReason:promptMessage reply:^(BOOL success, NSError *biometricError) {
+      [context evaluatePolicy:LAPolicyDeviceOwnerAuthentication localizedReason:promptMessage reply:^(BOOL success, NSError *biometricError) {
       if (success) {
         NSDictionary *result = @{
           @"success": @(YES)

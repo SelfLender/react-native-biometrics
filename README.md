@@ -261,6 +261,7 @@ __Options Object__
 | Parameter | Type | Description | iOS | Android |
 | --- | --- | --- | --- | --- |
 | promptMessage | string | Message that will be displayed in the biometrics prompt | ✔ | ✔ |
+| fallbackPromptMessage | string | Message that will be shown when FaceID or TouchID has failed and a passcode has been set on the device. | ✔ | ✖ |
 | cancelButtonText | string | Text to be displayed for the cancel button on biometric prompts, defaults to `Cancel` | ✖ | ✔ |
 
 __Result Object__

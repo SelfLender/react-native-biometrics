@@ -39,6 +39,7 @@ interface CreateSignatureResult {
 
 interface SimplePromptOptions {
     promptMessage: string
+    fallbackPromptMessage?: string
     cancelButtonText?: string
 }
 
@@ -125,6 +126,10 @@ module ReactNativeBiometrics {
     export function simplePrompt(simplePromptOptions: SimplePromptOptions): Promise<SimplePromptResult> {
         if (!simplePromptOptions.cancelButtonText) {
             simplePromptOptions.cancelButtonText = 'Cancel';
+        }
+
+        if (!simplePromptOptions.fallbackPromptMessage) {
+            simplePromptOptions.cancelButtonText = 'Use Passcode';
         }
 
         return bridge.simplePrompt(simplePromptOptions);
