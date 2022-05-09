@@ -1,6 +1,6 @@
 {
   "name": "react-native-biometrics",
-  "version": "2.1.4",
+  "version": "2.2.0",
   "summary": "A React Native library for biometrics",
   "description": "React Native biometric functionality for signing and encryption",
   "main": "build/cjs/index.js",
