@@ -8,12 +8,14 @@ buildscript {
     // module dependency in an application project.
     if (project == rootProject) {
         repositories {
+            mavenCentral()
+            maven { url "$rootDir/../node_modules/react-native/android" }
             google()
-            jcenter()
         }
 
         dependencies {
             classpath("com.android.tools.build:gradle:3.6.2")
+
         }
     }
 }
@@ -36,6 +38,7 @@ android {
 
 repositories {
     mavenCentral()
+    maven { url "$rootDir/../node_modules/react-native/android" }
     google()
 }
 
