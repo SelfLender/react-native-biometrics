@@ -28,7 +28,7 @@ interface DeleteKeysResult {
 interface CreateSignatureOptions {
     promptMessage: string
     payload: string
-    cancelButtonText?: string
+    allowDeviceCredentials?: boolean
 }
 
 interface CreateSignatureResult {
@@ -40,7 +40,7 @@ interface CreateSignatureResult {
 interface SimplePromptOptions {
     promptMessage: string
     fallbackPromptMessage?: string
-    cancelButtonText?: string
+    allowDeviceCredentials?: boolean
 }
 
 interface SimplePromptResult {
@@ -103,13 +103,10 @@ module ReactNativeBiometrics {
      * @param {Object} createSignatureOptions
      * @param {string} createSignatureOptions.promptMessage
      * @param {string} createSignatureOptions.payload
-     * @param {string} createSignatureOptions.cancelButtonText (Android only)
      * @returns {Promise<Object>}  Promise that resolves to an object cryptographic signature details
      */
     export function createSignature(createSignatureOptions: CreateSignatureOptions): Promise<CreateSignatureResult> {
-        if (!createSignatureOptions.cancelButtonText) {
-            createSignatureOptions.cancelButtonText = 'Cancel';
-        }
+        createSignatureOptions.allowDeviceCredentials = createSignatureOptions.allowDeviceCredentials ?? false
 
         return bridge.createSignature(createSignatureOptions);
     }
@@ -120,17 +117,12 @@ module ReactNativeBiometrics {
      * object.success = false if the user cancels, and rejects if anything fails
      * @param {Object} simplePromptOptions
      * @param {string} simplePromptOptions.promptMessage
-     * @param {string} simplePromptOptions.cancelButtonText (Android only)
+     * @param {string} simplePromptOptions.fallbackPromptMessage
      * @returns {Promise<Object>}  Promise that resolves an object with details about the biometrics result
      */
     export function simplePrompt(simplePromptOptions: SimplePromptOptions): Promise<SimplePromptResult> {
-        if (!simplePromptOptions.cancelButtonText) {
-            simplePromptOptions.cancelButtonText = 'Cancel';
-        }
-
-        if (!simplePromptOptions.fallbackPromptMessage) {
-            simplePromptOptions.cancelButtonText = 'Use Passcode';
-        }
+        simplePromptOptions.fallbackPromptMessage = simplePromptOptions.fallbackPromptMessage ?? 'Use Passcode';
+        simplePromptOptions.allowDeviceCredentials = simplePromptOptions.allowDeviceCredentials ?? false
 
         return bridge.simplePrompt(simplePromptOptions);
     }

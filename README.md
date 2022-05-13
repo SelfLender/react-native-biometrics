@@ -222,7 +222,7 @@ __Options Object__
 | --- | --- | --- | --- | --- |
 | promptMessage | string | Message that will be displayed in the fingerprint or face id prompt | ✔ | ✔ |
 | payload | string | String of data to be signed by the RSA signature | ✔ | ✔ |
-| cancelButtonText | string | Text to be displayed for the cancel button on biometric prompts, defaults to `Cancel` | ✖ | ✔ |
+| allowDeviceCredentials | boolean | Boolean that provides the user the option to bypass using biometric information to retrieve the private key. | ✖ | ✔ |
 
 __Result Object__
 
@@ -266,7 +266,7 @@ __Options Object__
 | --- | --- | --- | --- | --- |
 | promptMessage | string | Message that will be displayed in the biometrics prompt | ✔ | ✔ |
 | fallbackPromptMessage | string | Message that will be shown when FaceID or TouchID has failed and a passcode has been set on the device. | ✔ | ✖ |
-| cancelButtonText | string | Text to be displayed for the cancel button on biometric prompts, defaults to `Cancel` | ✖ | ✔ |
+| allowDeviceCredentials | boolean | Boolean that provides the user the option to bypass using biometric information to retrieve the private key. | ✖ | ✔ |
 
 __Result Object__
 
