@@ -7,6 +7,10 @@ const { ReactNativeBiometrics: bridge } = NativeModules;
  */
 export type BiometryType = 'TouchID' | 'FaceID' | 'Biometrics';
 
+interface IsSensorAvailableOptions {
+    allowDeviceCredentials?: boolean
+}
+
 interface IsSensorAvailableResult {
     available: boolean
     biometryType?: BiometryType
@@ -28,6 +32,7 @@ interface DeleteKeysResult {
 interface CreateSignatureOptions {
     promptMessage: string
     payload: string
+    cancelButtonText?: string
     allowDeviceCredentials?: boolean
 }
 
@@ -40,6 +45,7 @@ interface CreateSignatureResult {
 interface SimplePromptOptions {
     promptMessage: string
     fallbackPromptMessage?: string
+    cancelButtonText?: string
     allowDeviceCredentials?: boolean
 }
 
@@ -66,8 +72,12 @@ module ReactNativeBiometrics {
      * Returns promise that resolves to an object with object.biometryType = Biometrics | TouchID | FaceID
      * @returns {Promise<Object>} Promise that resolves to an object with details about biometrics available
      */
-    export function isSensorAvailable(): Promise<IsSensorAvailableResult> {
-        return bridge.isSensorAvailable();
+    export function isSensorAvailable(isSensorAvailableOptions?: IsSensorAvailableOptions): Promise<IsSensorAvailableResult> {
+        const options = {
+          allowDeviceCredentials: isSensorAvailableOptions?.allowDeviceCredentials ?? false
+        }
+
+        return bridge.isSensorAvailable(options);
     }
     /**
      * Creates a public private key pair,returns promise that resolves to
