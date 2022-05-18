@@ -116,6 +116,7 @@ module ReactNativeBiometrics {
      * @returns {Promise<Object>}  Promise that resolves to an object cryptographic signature details
      */
     export function createSignature(createSignatureOptions: CreateSignatureOptions): Promise<CreateSignatureResult> {
+        createSignatureOptions.cancelButtonText = createSignatureOptions.cancelButtonText ?? 'Cancel';
         createSignatureOptions.allowDeviceCredentials = createSignatureOptions.allowDeviceCredentials ?? false
 
         return bridge.createSignature(createSignatureOptions);
@@ -131,6 +132,7 @@ module ReactNativeBiometrics {
      * @returns {Promise<Object>}  Promise that resolves an object with details about the biometrics result
      */
     export function simplePrompt(simplePromptOptions: SimplePromptOptions): Promise<SimplePromptResult> {
+        simplePromptOptions.cancelButtonText = simplePromptOptions.cancelButtonText ?? 'Cancel';
         simplePromptOptions.fallbackPromptMessage = simplePromptOptions.fallbackPromptMessage ?? 'Use Passcode';
         simplePromptOptions.allowDeviceCredentials = simplePromptOptions.allowDeviceCredentials ?? false
 

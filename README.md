@@ -104,6 +104,11 @@ if (biometryType === ReactNativeBiometrics.Biometrics) {
 
 Detects what type of biometric sensor is available.  Returns a `Promise` that resolves to an object with details about biometrics availability
 
+__Options Object__
+| Parameter | Type | Description | iOS | Android |
+| --- | --- | --- | --- | --- |
+| allowDeviceCredentials | boolean | Boolean that provides the user the option to bypass using biometric information to retrieve the private key. Note: This feature is not supported in Android versions prior to API 30. | ✖ | ✔ |
+
 __Result Object__
 
 | Property | Type | Description |
@@ -222,7 +227,8 @@ __Options Object__
 | --- | --- | --- | --- | --- |
 | promptMessage | string | Message that will be displayed in the fingerprint or face id prompt | ✔ | ✔ |
 | payload | string | String of data to be signed by the RSA signature | ✔ | ✔ |
-| allowDeviceCredentials | boolean | Boolean that provides the user the option to bypass using biometric information to retrieve the private key. | ✖ | ✔ |
+| cancelButtonText | string | Text to be displayed for the cancel button on biometric prompts, defaults to `Cancel` | ✖ | ✔ |
+| allowDeviceCredentials | boolean | Boolean that provides the user the option to bypass using biometric information to retrieve the private key. Note: This feature is not supported in Android versions prior to API 30. | ✖ | ✔ |
 
 __Result Object__
 
@@ -266,7 +272,8 @@ __Options Object__
 | --- | --- | --- | --- | --- |
 | promptMessage | string | Message that will be displayed in the biometrics prompt | ✔ | ✔ |
 | fallbackPromptMessage | string | Message that will be shown when FaceID or TouchID has failed and a passcode has been set on the device. | ✔ | ✖ |
-| allowDeviceCredentials | boolean | Boolean that provides the user the option to bypass using biometric information to retrieve the private key. | ✖ | ✔ |
+| cancelButtonText | string | Text to be displayed for the cancel button on biometric prompts, defaults to `Cancel` | ✖ | ✔ |
+| allowDeviceCredentials | boolean | Boolean that provides the user the option to bypass using biometric information to retrieve the private key. Note: This feature is not supported in Android versions prior to API 30. | ✖ | ✔ |
 
 __Result Object__
 
