@@ -48,7 +48,7 @@ This package is designed to make server authentication using biometrics easier. 
 
 When a user enrolls in biometrics, a key pair is generated.  The private key is stored securely on the device and the public key is sent to a server for registration.  When the user wishes to authenticate, the user is prompted for biometrics, which unlocks the securely stored private key.  Then a cryptographic signature is generated and sent to the server for verification.  The server then verifies the signature.  If the verification was successful, the server returns an appropriate response and authorizes the user.
 
-## Constants
+## Biometry Types
 
 ### TouchID (iOS only)
 
@@ -105,7 +105,16 @@ if (biometryType === BiometryTypes.Biometrics) {
 __Options Object__
 | Parameter | Type | Description | iOS | Android |
 | --- | --- | --- | --- | --- |
-| allowDeviceCredentials | boolean | Boolean that will enable the user to opt to use their device passcode to bypass biometric authentication. Note: This feature is not supported in Android versions prior to API 30. | ✔ | ✔ |
+| allowDeviceCredentials | boolean | Boolean that will enable the ability for the device passcode to be used instead of biometric information. On iOS, the prompt will only be shown after biometrics has failed twice. On Android, the prompt will be shown on the biometric prompt and does not require the user to attempt to use biometrics information first. Note: This feature is not supported on Android versions prior to API 30. | ✔ | ✔ |
+
+__Example__
+
+```js
+import ReactNativeBiometrics from 'react-native-biometrics'
+
+const biometrics = new ReactNativeBiometrics({ allowDeviceCredentials: true }
+
+```
 
 ### isSensorAvailable()
 
