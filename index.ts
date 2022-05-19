@@ -17,6 +17,10 @@ interface IsSensorAvailableResult {
     error?: string
 }
 
+interface CreateKeysOptions {
+    allowDeviceCredentials?: boolean
+}
+
 interface CreateKeysResult {
     publicKey: string
 }
@@ -70,6 +74,8 @@ module ReactNativeBiometrics {
 
     /**
      * Returns promise that resolves to an object with object.biometryType = Biometrics | TouchID | FaceID
+     * @param {Object} isSensorAvailableOptions
+     * @param {boolean} isSensorAvailableOptions.allowDeviceCredentials
      * @returns {Promise<Object>} Promise that resolves to an object with details about biometrics available
      */
     export function isSensorAvailable(isSensorAvailableOptions?: IsSensorAvailableOptions): Promise<IsSensorAvailableResult> {
@@ -82,10 +88,16 @@ module ReactNativeBiometrics {
     /**
      * Creates a public private key pair,returns promise that resolves to
      * an object with object.publicKey, which is the public key of the newly generated key pair
+     * @param {Object} createKeysOptions
+     * @param {boolean} createKeysOptions.allowDeviceCredentials
      * @returns {Promise<Object>}  Promise that resolves to object with details about the newly generated public key
      */
-    export function createKeys(): Promise<CreateKeysResult> {
-        return bridge.createKeys();
+    export function createKeys(createKeysOptions?: CreateKeysOptions): Promise<CreateKeysResult> {
+        const options = {
+          allowDeviceCredentials: createKeysOptions?.allowDeviceCredentials ?? false
+        }
+
+        return bridge.createKeys(options);
     }
 
     /**
@@ -113,6 +125,7 @@ module ReactNativeBiometrics {
      * @param {Object} createSignatureOptions
      * @param {string} createSignatureOptions.promptMessage
      * @param {string} createSignatureOptions.payload
+     * @param {boolean} createSignatureOptions.allowDeviceCredentials
      * @returns {Promise<Object>}  Promise that resolves to an object cryptographic signature details
      */
     export function createSignature(createSignatureOptions: CreateSignatureOptions): Promise<CreateSignatureResult> {
@@ -129,6 +142,7 @@ module ReactNativeBiometrics {
      * @param {Object} simplePromptOptions
      * @param {string} simplePromptOptions.promptMessage
      * @param {string} simplePromptOptions.fallbackPromptMessage
+     * @param {boolean} simplePromptOptions.allowDeviceCredentials
      * @returns {Promise<Object>}  Promise that resolves an object with details about the biometrics result
      */
     export function simplePrompt(simplePromptOptions: SimplePromptOptions): Promise<SimplePromptResult> {

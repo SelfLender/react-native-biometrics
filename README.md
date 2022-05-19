@@ -107,7 +107,7 @@ Detects what type of biometric sensor is available.  Returns a `Promise` that re
 __Options Object__
 | Parameter | Type | Description | iOS | Android |
 | --- | --- | --- | --- | --- |
-| allowDeviceCredentials | boolean | Boolean that provides the user the option to bypass using biometric information to retrieve the private key. Note: This feature is not supported in Android versions prior to API 30. | ✖ | ✔ |
+| allowDeviceCredentials | boolean | Boolean that will enable the user to opt to use their device passcode to bypass biometric authentication. Note: This feature is not supported in Android versions prior to API 30. | ✔ | ✔ |
 
 __Result Object__
 
@@ -141,6 +141,11 @@ ReactNativeBiometrics.isSensorAvailable()
 ### createKeys()
 
 Generates a public private RSA 2048 key pair that will be stored in the device keystore.  Returns a `Promise` that resolves to an object providing details about the keys.
+
+__Options Object__
+| Parameter | Type | Description | iOS | Android |
+| --- | --- | --- | --- | --- |
+| allowDeviceCredentials | boolean | Boolean that will enable the user to opt to use their device passcode to bypass biometric authentication. Note: This option is only needed to make iOS support for passcode fallback work. | ✔ | ✖ |
 
 __Result Object__
 
@@ -228,7 +233,7 @@ __Options Object__
 | promptMessage | string | Message that will be displayed in the fingerprint or face id prompt | ✔ | ✔ |
 | payload | string | String of data to be signed by the RSA signature | ✔ | ✔ |
 | cancelButtonText | string | Text to be displayed for the cancel button on biometric prompts, defaults to `Cancel` | ✖ | ✔ |
-| allowDeviceCredentials | boolean | Boolean that provides the user the option to bypass using biometric information to retrieve the private key. Note: This feature is not supported in Android versions prior to API 30. | ✖ | ✔ |
+| allowDeviceCredentials | boolean | Boolean that will enable the user to opt to use their device passcode to bypass biometric authentication. Note: This feature is not supported in Android versions prior to API 30. | ✔ | ✔ |
 
 __Result Object__
 
@@ -273,7 +278,7 @@ __Options Object__
 | promptMessage | string | Message that will be displayed in the biometrics prompt | ✔ | ✔ |
 | fallbackPromptMessage | string | Message that will be shown when FaceID or TouchID has failed and a passcode has been set on the device. | ✔ | ✖ |
 | cancelButtonText | string | Text to be displayed for the cancel button on biometric prompts, defaults to `Cancel` | ✖ | ✔ |
-| allowDeviceCredentials | boolean | Boolean that provides the user the option to bypass using biometric information to retrieve the private key. Note: This feature is not supported in Android versions prior to API 30. | ✖ | ✔ |
+| allowDeviceCredentials | boolean | Boolean that will enable the user to opt to use their device passcode to bypass biometric authentication. Note: This feature is not supported in Android versions prior to API 30. | ✔ | ✔ |
 
 __Result Object__
 

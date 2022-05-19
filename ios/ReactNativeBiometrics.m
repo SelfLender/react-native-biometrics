@@ -13,11 +13,17 @@
 
 RCT_EXPORT_MODULE(ReactNativeBiometrics);
 
-RCT_EXPORT_METHOD(isSensorAvailable:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
-{
+RCT_EXPORT_METHOD(isSensorAvailable: (NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   LAContext *context = [[LAContext alloc] init];
   NSError *la_error = nil;
-  BOOL canEvaluatePolicy = [context canEvaluatePolicy:LAPolicyDeviceOwnerAuthentication error:&la_error];
+  BOOL allowDeviceCredentials = [RCTConvert BOOL:params[@"allowDeviceCredentials"]];
+  LAPolicy laPolicy = LAPolicyDeviceOwnerAuthenticationWithBiometrics;
+
+  if (allowDeviceCredentials == TRUE) {
+    laPolicy = LAPolicyDeviceOwnerAuthentication;
+  }
+
+  BOOL canEvaluatePolicy = [context canEvaluatePolicy:laPolicy error:&la_error];
 
   if (canEvaluatePolicy) {
     NSString *biometryType = [self getBiometryType:context];
@@ -38,13 +44,20 @@ RCT_EXPORT_METHOD(isSensorAvailable:(RCTPromiseResolveBlock)resolve rejecter:(RC
   }
 }
 
-RCT_EXPORT_METHOD(createKeys: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_METHOD(createKeys: (NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     CFErrorRef error = NULL;
+    BOOL allowDeviceCredentials = [RCTConvert BOOL:params[@"allowDeviceCredentials"]];
+
+    SecAccessControlCreateFlags secCreateFlag = kSecAccessControlBiometryAny;
+
+    if (allowDeviceCredentials == TRUE) {
+      secCreateFlag = kSecAccessControlUserPresence;
+    }
 
     SecAccessControlRef sacObject = SecAccessControlCreateWithFlags(kCFAllocatorDefault,
                                                                     kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly,
-                                                                    kSecAccessControlUserPresence, &error);
+                                                                    secCreateFlag, &error);
     if (sacObject == NULL || error != NULL) {
       NSString *errorString = [NSString stringWithFormat:@"SecItemAdd can't create sacObject: %@", error];
       reject(@"storage_error", errorString, nil);
@@ -160,11 +173,19 @@ RCT_EXPORT_METHOD(simplePrompt: (NSDictionary *)params resolver:(RCTPromiseResol
   dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     NSString *promptMessage = [RCTConvert NSString:params[@"promptMessage"]];
     NSString *fallbackPromptMessage = [RCTConvert NSString:params[@"fallbackPromptMessage"]];
+    BOOL allowDeviceCredentials = [RCTConvert BOOL:params[@"allowDeviceCredentials"]];
 
     LAContext *context = [[LAContext alloc] init];
-    context.localizedFallbackTitle = fallbackPromptMessage;
+    LAPolicy laPolicy = LAPolicyDeviceOwnerAuthenticationWithBiometrics;
 
-      [context evaluatePolicy:LAPolicyDeviceOwnerAuthentication localizedReason:promptMessage reply:^(BOOL success, NSError *biometricError) {
+    if (allowDeviceCredentials == TRUE) {
+      laPolicy = LAPolicyDeviceOwnerAuthentication;
+      context.localizedFallbackTitle = fallbackPromptMessage;
+    } else {
+      context.localizedFallbackTitle = @"";
+    }
+
+    [context evaluatePolicy:laPolicy localizedReason:promptMessage reply:^(BOOL success, NSError *biometricError) {
       if (success) {
         NSDictionary *result = @{
           @"success": @(YES)
