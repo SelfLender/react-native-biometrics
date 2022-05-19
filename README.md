@@ -57,11 +57,11 @@ A constant for the touch id sensor type, evaluates to `'TouchID'`
 __Example__
 
 ```js
-import ReactNativeBiometrics from 'react-native-biometrics'
+import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
 
-const { biometryType } = await ReactNativeBiometrics.isSensorAvailable()
+const { biometryType } = await new ReactNativeBiometrics().isSensorAvailable()
 
-if (biometryType === ReactNativeBiometrics.TouchID) {
+if (biometryType === BiometryTypes.TouchID) {
   //do something fingerprint specific
 }
 ```
@@ -73,11 +73,11 @@ A constant for the face id sensor type, evaluates to `'FaceID'`
 __Example__
 
 ```js
-import ReactNativeBiometrics from 'react-native-biometrics'
+import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
 
-const { biometryType } = await ReactNativeBiometrics.isSensorAvailable()
+const { biometryType } = await new ReactNativeBiometrics().isSensorAvailable()
 
-if (biometryType === ReactNativeBiometrics.FaceID) {
+if (biometryType === BiometryTypes.FaceID) {
   //do something face id specific
 }
 ```
@@ -89,25 +89,27 @@ A constant for generic Biometrics, evaluates to `'Biometrics'`
 __Example__
 
 ```js
-import ReactNativeBiometrics from 'react-native-biometrics'
+import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
 
-const { biometryType } = await ReactNativeBiometrics.isSensorAvailable()
+const { biometryType } = await new ReactNativeBiometrics().isSensorAvailable()
 
-if (biometryType === ReactNativeBiometrics.Biometrics) {
+if (biometryType === BiometryTypes.Biometrics) {
   //do something face id specific
 }
 ```
 
-## Methods
+## Class
 
-### isSensorAvailable()
-
-Detects what type of biometric sensor is available.  Returns a `Promise` that resolves to an object with details about biometrics availability
+## Constructor
 
 __Options Object__
 | Parameter | Type | Description | iOS | Android |
 | --- | --- | --- | --- | --- |
 | allowDeviceCredentials | boolean | Boolean that will enable the user to opt to use their device passcode to bypass biometric authentication. Note: This feature is not supported in Android versions prior to API 30. | ✔ | ✔ |
+
+### isSensorAvailable()
+
+Detects what type of biometric sensor is available.  Returns a `Promise` that resolves to an object with details about biometrics availability
 
 __Result Object__
 
@@ -120,17 +122,17 @@ __Result Object__
 __Example__
 
 ```js
-import ReactNativeBiometrics from 'react-native-biometrics'
+import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
 
-ReactNativeBiometrics.isSensorAvailable()
+new ReactNativeBiometrics().isSensorAvailable()
   .then((resultObject) => {
     const { available, biometryType } = resultObject
 
-    if (available && biometryType === ReactNativeBiometrics.TouchID) {
+    if (available && biometryType === BiometryTypes.TouchID) {
       console.log('TouchID is supported')
-    } else if (available && biometryType === ReactNativeBiometrics.FaceID) {
+    } else if (available && biometryType === BiometryTypes.FaceID) {
       console.log('FaceID is supported')
-    } else if (available && biometryType === ReactNativeBiometrics.Biometrics) {
+    } else if (available && biometryType === BiometryTypes.Biometrics) {
       console.log('Biometrics is supported')
     } else {
       console.log('Biometrics not supported')
@@ -141,11 +143,6 @@ ReactNativeBiometrics.isSensorAvailable()
 ### createKeys()
 
 Generates a public private RSA 2048 key pair that will be stored in the device keystore.  Returns a `Promise` that resolves to an object providing details about the keys.
-
-__Options Object__
-| Parameter | Type | Description | iOS | Android |
-| --- | --- | --- | --- | --- |
-| allowDeviceCredentials | boolean | Boolean that will enable the user to opt to use their device passcode to bypass biometric authentication. Note: This option is only needed to make iOS support for passcode fallback work. | ✔ | ✖ |
 
 __Result Object__
 
@@ -158,7 +155,7 @@ __Example__
 ```js
 import ReactNativeBiometrics from 'react-native-biometrics'
 
-ReactNativeBiometrics.createKeys()
+new ReactNativeBiometrics().createKeys()
   .then((resultObject) => {
     const { publicKey } = resultObject
     console.log(publicKey)
@@ -181,7 +178,7 @@ __Example__
 ```js
 import ReactNativeBiometrics from 'react-native-biometrics'
 
-ReactNativeBiometrics.biometricKeysExist()
+new ReactNativeBiometrics().biometricKeysExist()
   .then((resultObject) => {
     const { keysExist } = resultObject
 
@@ -208,7 +205,7 @@ __Example__
 ```js
 import ReactNativeBiometrics from 'react-native-biometrics'
 
-ReactNativeBiometrics.deleteKeys()
+new ReactNativeBiometrics().deleteKeys()
   .then((resultObject) => {
     const { keysDeleted } = resultObject
 
@@ -233,7 +230,6 @@ __Options Object__
 | promptMessage | string | Message that will be displayed in the fingerprint or face id prompt | ✔ | ✔ |
 | payload | string | String of data to be signed by the RSA signature | ✔ | ✔ |
 | cancelButtonText | string | Text to be displayed for the cancel button on biometric prompts, defaults to `Cancel` | ✖ | ✔ |
-| allowDeviceCredentials | boolean | Boolean that will enable the user to opt to use their device passcode to bypass biometric authentication. Note: This feature is not supported in Android versions prior to API 30. | ✔ | ✔ |
 
 __Result Object__
 
@@ -251,7 +247,7 @@ import ReactNativeBiometrics from 'react-native-biometrics'
 let epochTimeSeconds = Math.round((new Date()).getTime() / 1000).toString()
 let payload = epochTimeSeconds + 'some message'
 
-ReactNativeBiometrics.createSignature({
+new ReactNativeBiometrics().createSignature({
     promptMessage: 'Sign in',
     payload: payload
   })
@@ -278,7 +274,6 @@ __Options Object__
 | promptMessage | string | Message that will be displayed in the biometrics prompt | ✔ | ✔ |
 | fallbackPromptMessage | string | Message that will be shown when FaceID or TouchID has failed and a passcode has been set on the device. | ✔ | ✖ |
 | cancelButtonText | string | Text to be displayed for the cancel button on biometric prompts, defaults to `Cancel` | ✖ | ✔ |
-| allowDeviceCredentials | boolean | Boolean that will enable the user to opt to use their device passcode to bypass biometric authentication. Note: This feature is not supported in Android versions prior to API 30. | ✔ | ✔ |
 
 __Result Object__
 
@@ -292,7 +287,7 @@ __Example__
 ```js
 import ReactNativeBiometrics from 'react-native-biometrics'
 
-ReactNativeBiometrics.simplePrompt({promptMessage: 'Confirm fingerprint'})
+new ReactNativeBiometrics().simplePrompt({promptMessage: 'Confirm fingerprint'})
   .then((resultObject) => {
     const { success } = resultObject
 
