@@ -15,8 +15,14 @@ All notable changes to this project will be documented in this file.
   + Upgraded androidx.biometric 1.1.0
     * Added `allowDeviceCredentials` option, for android devices, to `isSensorAvailable`, `createSignature` and `simplePrompt`. This option is only affects devices running API 30 or greater. Devices running API 29 or less cannot support device credentials when performing crypto based authentication. See https://developer.android.com/reference/androidx/biometric/BiometricPrompt.PromptInfo.Builder#setAllowedAuthenticators(int)
   + Updated `build.gradle` file to avoid unnecessary downloads and potential conflicts when the library is included as a module dependency in an application project.
+  + Added optional passcode fallback for iOS devices when FaceID or TouchID fails and the device has a passcode set.
+  + Added `fallbackPromptMessage` to `simplePrompt`. This controls the message that is shown when FaceID or TouchID has failed and the prompt falls back to the device passcode for authentication. 
+- Android
+  + Upgraded androidx.biomtric 1.1.0
+    * Added `allowDeviceCredentials` option, for android devices, to `isSensorAvailable`, `createSignature` and `simplePrompt`. This option is only affects devices running API 30 or greater. Devices running API 29 or less cannot support device credentials when performing crypto based authentication. See https://developer.android.com/reference/androidx/biometric/BiometricPrompt.PromptInfo.Builder#setAllowedAuthenticators(int)
+  + Updated `build.gradle` file to avoid unnecessary downloads and potential conflicts when the library is included as a module dependency in an application project.
 
-# [2.1.4] - 2020-02-10
+## [2.1.4] - 2020-02-10
 ## Changed
 - Removed duplicate onAuthenticationError call in android
 - Upgraded androidx.biomtric to the latest fix version
