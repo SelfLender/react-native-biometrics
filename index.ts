@@ -52,26 +52,26 @@ interface SimplePromptResult {
   error?: string
 }
 
+/**
+ * Enum for touch id sensor type
+ */
+export const TouchID = 'TouchID'
+/**
+ * Enum for face id sensor type
+ */
+export const FaceID = 'FaceID'
+/**
+ * Enum for generic biometrics (this is the only value available on android)
+ */
+export const Biometrics = 'Biometrics'
+
+export const BiometryTypes = {
+  TouchID,
+  FaceID,
+  Biometrics
+}
+
 export module ReactNativeBiometricsLegacy {
-  /**
-   * Enum for touch id sensor type
-   */
-  export const TouchID = 'TouchID'
-  /**
-   * Enum for face id sensor type
-   */
-  export const FaceID = 'FaceID'
-  /**
-   * Enum for generic biometrics (this is the only value available on android)
-   */
-  export const Biometrics = 'Biometrics'
-
-  export const BiometryTypes = {
-    TouchID,
-    FaceID,
-    Biometrics
-  }
-
   /**
    * Returns promise that resolves to an object with object.biometryType = Biometrics | TouchID | FaceID
    * @returns {Promise<Object>} Promise that resolves to an object with details about biometrics available
