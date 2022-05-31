@@ -59,7 +59,9 @@ __Example__
 ```js
 import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
 
-const { biometryType } = await new ReactNativeBiometrics().isSensorAvailable()
+const rnBiometrics = new ReactNativeBiometrics()
+
+const { biometryType } = await rnBiometrics.isSensorAvailable()
 
 if (biometryType === BiometryTypes.TouchID) {
   //do something fingerprint specific
@@ -75,7 +77,9 @@ __Example__
 ```js
 import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
 
-const { biometryType } = await new ReactNativeBiometrics().isSensorAvailable()
+const rnBiometrics = new ReactNativeBiometrics()
+
+const { biometryType } = await rnBiometrics.isSensorAvailable()
 
 if (biometryType === BiometryTypes.FaceID) {
   //do something face id specific
@@ -91,7 +95,9 @@ __Example__
 ```js
 import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
 
-const { biometryType } = await new ReactNativeBiometrics().isSensorAvailable()
+const rnBiometrics = new ReactNativeBiometrics()
+
+const { biometryType } = await rnBiometrics.isSensorAvailable()
 
 if (biometryType === BiometryTypes.Biometrics) {
   //do something face id specific
@@ -112,7 +118,10 @@ __Example__
 ```js
 import ReactNativeBiometrics from 'react-native-biometrics'
 
-const biometrics = new ReactNativeBiometrics({ allowDeviceCredentials: true }
+const rnBiometrics = new ReactNativeBiometrics({ allowDeviceCredentials: true })
+
+// Perform operations as normal
+// All prompts will allow for fallback to the device's credentials for authentication
 
 ```
 
@@ -133,7 +142,9 @@ __Example__
 ```js
 import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
 
-new ReactNativeBiometrics().isSensorAvailable()
+const rnBiometrics = new ReactNativeBiometrics()
+
+rnBiometrics.isSensorAvailable()
   .then((resultObject) => {
     const { available, biometryType } = resultObject
 
@@ -164,7 +175,9 @@ __Example__
 ```js
 import ReactNativeBiometrics from 'react-native-biometrics'
 
-new ReactNativeBiometrics().createKeys()
+const rnBiometrics = new ReactNativeBiometrics()
+
+rnBiometrics.createKeys()
   .then((resultObject) => {
     const { publicKey } = resultObject
     console.log(publicKey)
@@ -187,7 +200,8 @@ __Example__
 ```js
 import ReactNativeBiometrics from 'react-native-biometrics'
 
-new ReactNativeBiometrics().biometricKeysExist()
+const rnBiometrics = new ReactNativeBiometrics()
+rnBiometrics.biometricKeysExist()
   .then((resultObject) => {
     const { keysExist } = resultObject
 
@@ -214,7 +228,9 @@ __Example__
 ```js
 import ReactNativeBiometrics from 'react-native-biometrics'
 
-new ReactNativeBiometrics().deleteKeys()
+const rnBiometrics = new ReactNativeBiometrics()
+
+rnBiometrics.deleteKeys()
   .then((resultObject) => {
     const { keysDeleted } = resultObject
 
@@ -256,7 +272,9 @@ import ReactNativeBiometrics from 'react-native-biometrics'
 let epochTimeSeconds = Math.round((new Date()).getTime() / 1000).toString()
 let payload = epochTimeSeconds + 'some message'
 
-new ReactNativeBiometrics().createSignature({
+const rnBiometrics = new ReactNativeBiometrics()
+
+rnBiometrics.createSignature({
     promptMessage: 'Sign in',
     payload: payload
   })
@@ -296,7 +314,9 @@ __Example__
 ```js
 import ReactNativeBiometrics from 'react-native-biometrics'
 
-new ReactNativeBiometrics().simplePrompt({promptMessage: 'Confirm fingerprint'})
+const rnBiometrics = new ReactNativeBiometrics()
+
+rnBiometrics.simplePrompt({promptMessage: 'Confirm fingerprint'})
   .then((resultObject) => {
     const { success } = resultObject
 
