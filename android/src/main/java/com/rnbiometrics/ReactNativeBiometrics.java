@@ -91,7 +91,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void createKeys(Promise promise) {
+    public void createKeys(final ReadableMap params, Promise promise) {
         try {
             if (isCurrentSDKMarshmallowOrLater()) {
                 deleteBiometricKey();
