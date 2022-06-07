@@ -2,29 +2,34 @@ apply plugin: 'com.android.library'
 
 description = 'react-native-biometrics'
 
-def DEFAULT_COMPILE_SDK_VERSION             = 29
-def DEFAULT_BUILD_TOOLS_VERSION             = "29.0.2"
-def DEFAULT_MIN_SDK_VERSION                 = 16
-def DEFAULT_TARGET_SDK_VERSION              = 29
-
 buildscript {
-    repositories {
-        google()
-        jcenter()
-    }
+    // The Android Gradle plugin is only required when opening the android folder stand-alone.
+    // This avoids unnecessary downloads and potential conflicts when the library is included as a
+    // module dependency in an application project.
+    if (project == rootProject) {
+        repositories {
+            mavenCentral()
+            maven { url "$rootDir/../node_modules/react-native/android" }
+            google()
+        }
 
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.2'
+        dependencies {
+            classpath("com.android.tools.build:gradle:3.6.2")
+
+        }
     }
 }
 
+def safeExtGet(prop, fallback) {
+    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+}
+
 android {
-    compileSdkVersion rootProject.hasProperty('compileSdkVersion') ? rootProject.compileSdkVersion : DEFAULT_COMPILE_SDK_VERSION
-    buildToolsVersion rootProject.hasProperty('buildToolsVersion') ? rootProject.buildToolsVersion : DEFAULT_BUILD_TOOLS_VERSION
+    compileSdkVersion safeExtGet('compileSdkVersion', 29)
 
     defaultConfig {
-        minSdkVersion rootProject.hasProperty('minSdkVersion') ? rootProject.minSdkVersion : DEFAULT_MIN_SDK_VERSION
-        targetSdkVersion rootProject.hasProperty('targetSdkVersion') ? rootProject.targetSdkVersion : DEFAULT_TARGET_SDK_VERSION
+        minSdkVersion safeExtGet('minSdkVersion', 16)
+        targetSdkVersion safeExtGet('targetSdkVersion', 29)
     }
     lintOptions {
         abortOnError false
@@ -33,10 +38,11 @@ android {
 
 repositories {
     mavenCentral()
+    maven { url "$rootDir/../node_modules/react-native/android" }
     google()
 }
 
 dependencies {
-    implementation 'androidx.biometric:biometric:1.0.1'
+    implementation 'androidx.biometric:biometric:1.1.0'
     implementation 'com.facebook.react:react-native:+'
 }
