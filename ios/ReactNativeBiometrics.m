@@ -16,12 +16,12 @@ RCT_EXPORT_MODULE(ReactNativeBiometrics);
 RCT_EXPORT_METHOD(isSensorAvailable: (NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   LAContext *context = [[LAContext alloc] init];
   NSError *la_error = nil;
-  BOOL allowDeviceCredentials = [RCTConvert BOOL:params[@"allowDeviceCredentials"]];
+//   BOOL allowDeviceCredentials = [RCTConvert BOOL:params[@"allowDeviceCredentials"]];
   LAPolicy laPolicy = LAPolicyDeviceOwnerAuthenticationWithBiometrics;
 
-  if (allowDeviceCredentials == TRUE) {
-    laPolicy = LAPolicyDeviceOwnerAuthentication;
-  }
+//   if (allowDeviceCredentials == TRUE) {
+//     laPolicy = LAPolicyDeviceOwnerAuthentication;
+//   }
 
   BOOL canEvaluatePolicy = [context canEvaluatePolicy:laPolicy error:&la_error];
 
