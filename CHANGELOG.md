@@ -1,7 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [2.1.4] - 2020-02-10
+### [2.2.1] - 2022-09-06
+## Changed
+- Re-releasing 2.1.4 as 2.2.1 due to breaking API change released in 2.2.0. 2.2.0 will be re-released as 3.0.0 due to the breaking API change.
+
+# [2.1.4] - 2020-02-10
 ## Changed
 - Removed duplicate onAuthenticationError call in android
 - Upgraded androidx.biomtric to the latest fix version
