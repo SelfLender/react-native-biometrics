@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+### [2.2.1] - 2022-09-06
+## Changed
+- Re-releasing 2.1.4 as 2.2.1 due to breaking API change released in 2.2.0. 2.2.0 will be re-released as 3.0.0 due to the breaking API change.
+
 ## [2.2.0] - 2020-02-10
 ## Changed
 - iOS
@@ -12,7 +16,7 @@ All notable changes to this project will be documented in this file.
     * Added `allowDeviceCredentials` option, for android devices, to `isSensorAvailable`, `createSignature` and `simplePrompt`. This option is only affects devices running API 30 or greater. Devices running API 29 or less cannot support device credentials when performing crypto based authentication. See https://developer.android.com/reference/androidx/biometric/BiometricPrompt.PromptInfo.Builder#setAllowedAuthenticators(int)
   + Updated `build.gradle` file to avoid unnecessary downloads and potential conflicts when the library is included as a module dependency in an application project.
 
-## [2.1.4] - 2020-02-10
+# [2.1.4] - 2020-02-10
 ## Changed
 - Removed duplicate onAuthenticationError call in android
 - Upgraded androidx.biomtric to the latest fix version
