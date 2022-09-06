@@ -1,6 +1,14 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.0.0] - 2022-09-06
+## Changed
+- Re-releasing 2.2.0 as 3.0.0. 2.2.0 introduced a breaking API change and should have been released as a new major version.
+
+### [2.2.1] - 2022-09-06
+## Changed
+- Re-releasing 2.1.4 as 2.2.1 due to breaking API change released in 2.2.0. 2.2.0 will be re-released as 3.0.0 due to the breaking API change.
+
 ## [2.2.0] - 2020-02-10
 ## Changed
 - iOS
