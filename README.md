@@ -100,7 +100,7 @@ const rnBiometrics = new ReactNativeBiometrics()
 const { biometryType } = await rnBiometrics.isSensorAvailable()
 
 if (biometryType === BiometryTypes.Biometrics) {
-  //do something face id specific
+  //do something
 }
 ```
 
