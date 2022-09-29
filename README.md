@@ -44,7 +44,7 @@ This package requires a compiled SDK version of 29 (Android 10.0) or higher
 
 This package is designed to make server authentication using biometrics easier.  Here is an image from https://android-developers.googleblog.com/2015/10/new-in-android-samples-authenticating.html illustrating the basic use case:
 
-![react-native-biometrics](https://2.bp.blogspot.com/-Lp2zaAZietw/Vi59hb6k6SI/AAAAAAAABLk/HsXXBYiIwqU/s1600/image01.png)
+![react-native-biometrics](/assets/biometricsdiagram.png)
 
 When a user enrolls in biometrics, a key pair is generated.  The private key is stored securely on the device and the public key is sent to a server for registration.  When the user wishes to authenticate, the user is prompted for biometrics, which unlocks the securely stored private key.  Then a cryptographic signature is generated and sent to the server for verification.  The server then verifies the signature.  If the verification was successful, the server returns an appropriate response and authorizes the user.
 
