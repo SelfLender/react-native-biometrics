@@ -195,11 +195,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                                 if (allowDeviceCredentials) {
                                     biometricPrompt.authenticate(info);
                                 } else {
-                                    Signature signature = Signature.getInstance("SHA256withRSA");
-                                    KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
-                                    keyStore.load(null);
-                                    PrivateKey privateKey = (PrivateKey) keyStore.getKey(biometricKeyAlias, null);
-                                    signature.initSign(privateKey);
+                                    Signature signature = initializeSignature();
                                     biometricPrompt.authenticate(info, new BiometricPrompt.CryptoObject(signature));
                                 }
                             } catch (Exception e) {
