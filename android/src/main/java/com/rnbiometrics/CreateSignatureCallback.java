@@ -1,6 +1,6 @@
 package com.rnbiometrics;
 
-import static com.rnbiometrics.ReactNativeBiometrics.biometricKeyAlias;
+import static com.rnbiometrics.ReactNativeBiometrics.initializeSignature;
 
 import android.util.Base64;
 
@@ -70,12 +70,7 @@ public class CreateSignatureCallback extends BiometricPrompt.AuthenticationCallb
     @Nullable
     private Signature getSignature(@NonNull BiometricPrompt.AuthenticationResult result) throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException, UnrecoverableKeyException, InvalidKeyException {
         if (this.allowDeviceCredentials) {
-            Signature signature = Signature.getInstance("SHA256withRSA");
-            KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
-            keyStore.load(null);
-            PrivateKey privateKey = (PrivateKey) keyStore.getKey(biometricKeyAlias, null);
-            signature.initSign(privateKey);
-            return signature;
+            return initializeSignature();
         }
 
         BiometricPrompt.CryptoObject cryptoObject = result.getCryptoObject();
