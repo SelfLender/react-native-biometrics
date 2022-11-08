@@ -2,9 +2,12 @@ package com.rnbiometrics;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,5 +30,13 @@ public class ReactNativeBiometricsPackage implements ReactPackage {
         modules.add(new ReactNativeBiometrics(reactContext));
 
         return modules;
+    }
+
+    public static void rejectWithThrowable(final Promise promise, final String message, final Throwable e) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        String error = String.format("%s: %s\n%s", message, e.getMessage(), sw.toString());
+        promise.reject(error, error);
     }
 }

@@ -185,7 +185,28 @@ rnBiometrics.createKeys()
   })
 ```
 
-### biometricKeysExist()
+### CreateEncryptionKey()
+
+Performs platform dependent setup for symmetric encryption of local-only secrets that will be stored in the device keystore (AES-GCM on Android, RSA-OAEP-SHA512-wrapped AES-GCM on iOS.) Returns a promise that resolves to the success/failure status.
+
+__Result Object__
+
+| Property | Type | Description |
+| --- | --- | --- |
+| success | bool | A boolean indicating if the biometric prompt succeeded, `false` if the users cancels the biometrics prompt |
+
+```js
+import ReactNativeBiometrics from 'react-native-biometrics'
+
+ReactNativeBiometrics.createEncryptionKey('Confirm fingerprint')
+  .then((resultObject) => {
+    const { success } = resultObject
+    console.log(success)
+  })
+```
+
+
+### biometricKeysExist(), biometricEncryptionKeyExists()
 
 Detects if keys have already been generated and exist in the keystore.  Returns a `Promise` that resolves to an object indicating details about the keys.
 
@@ -211,11 +232,22 @@ rnBiometrics.biometricKeysExist()
       console.log('Keys do not exist or were deleted')
     }
   })
+
+ReactNativeBiometrics.biometricEncryptionKeyExists()
+  .then((resultObject) => {
+    const { keysExist } = resultObject
+
+    if (keysExist) {
+      console.log('Encryption key exist')
+    } else {
+      console.log('Encryption key does not exist or was deleted')
+    }
+  })
 ```
 
-### deleteKeys()
+### deleteKeys() , deleteEncryptionKey()
 
-Deletes the generated keys from the device keystore.  Returns a `Promise` that resolves to an object indicating details about the deletion.
+Deletes the generated key(s) from the device keystore.  Returns a `Promise` that resolves to an object indicating details about the deletion.
 
 __Result Object__
 
@@ -240,13 +272,24 @@ rnBiometrics.deleteKeys()
       console.log('Unsuccessful deletion because there were no keys to delete')
     }
   })
+
+ReactNativeBiometrics.deleteEncryptionKey()
+  .then((resultObject) => {
+    const { keysDeleted } = resultObject
+
+    if (keysDeleted) {
+      console.log('Successful deletion')
+    } else {
+      console.log('Unsuccessful deletion because there were no keys to delete')
+    }
+  })
 ```
 
 ### createSignature(options)
 
 Prompts the user for their fingerprint or face id in order to retrieve the private key from the keystore, then uses the private key to generate a RSA PKCS#1v1.5 SHA 256 signature.  Returns a `Promise` that resolves to an object with details about the signature.
 
-**NOTE: No biometric prompt is displayed in iOS simulators when attempting to retrieve keys for signature generation, it only occurs on actual devices.
+**NOTE: No biometric prompt is displayed in iOS simulators when attempting to retrieve keys for signature generation, it only occurs on actual devices.**
 
 __Options Object__
 
@@ -284,6 +327,98 @@ rnBiometrics.createSignature({
     if (success) {
       console.log(signature)
       verifySignatureWithServer(signature, payload)
+    }
+  })
+```
+
+### encryptData(options)
+
+Prompts the user for their fingerprint or face id in order to retrieve the key from the keystore, then uses it to encrypt the data. Returns a `Promise` that resolves to an object with the encrypted data and IV.
+
+**NOTE: No biometric prompt is displayed in iOS simulators when attempting to retrieve keys for signature generation, it only occurs on actual devices.**
+
+__Options Object__
+
+| Parameter | Type | Description | iOS | Android |
+| --- | --- | --- | --- | --- |
+| promptMessage | string | Message that will be displayed in the fingerprint or face id prompt | ✔ | ✔ |
+| payload | string | String of data to be encrypted | ✔ | ✔ |
+| cancelButtonText | string | Text to be displayed for the cancel button on biometric prompts, defaults to `Cancel` | ✖ | ✔ |
+
+__Result Object__
+
+| Property | Type | Description |
+| --- | --- | --- |
+| success | bool | A boolean indicating if the process was successful, `false` if the users cancels the biometrics prompt |
+| encrypted | string | A base64 encoded string representing the encrypted data. `undefined` if the process was not successful. |
+| iv | string | A base64 encoded string representing the AES initalisation vector. `undefined` if the process was not successful. |
+| error | string | An error message indicating reasons why signature creation failed. `undefined` if there is no error. |
+
+__Example__
+
+```js
+import ReactNativeBiometrics from 'react-native-biometrics'
+
+let payload = 'hunter2'
+
+ReactNativeBiometrics.encryptData({
+    promptMessage: 'Save password',
+    payload: payload
+  })
+  .then((resultObject) => {
+    const { success, encrypted, iv } = resultObject
+
+    if (success) {
+      console.log(encrypted, iv)
+      myStorageApi.set("encryptedPassword", encrypted)
+      myStorageApi.set("passwordIV", iv)
+    }
+  })
+```
+
+
+### decryptData(options)
+
+Prompts the user for their fingerprint or face id in order to retrieve the key from the keystore, then uses it to decrypt the payload with the supplied IV. Returns a `Promise` that resolves to an object with the decrypted data.
+
+**NOTE: No biometric prompt is displayed in iOS simulators when attempting to retrieve keys for signature generation, it only occurs on actual devices.**
+
+__Options Object__
+
+| Parameter | Type | Description | iOS | Android |
+| --- | --- | --- | --- | --- |
+| promptMessage | string | Message that will be displayed in the fingerprint or face id prompt | ✔ | ✔ |
+| payload | string | Base64 encoded data to decrypt | ✔ | ✔ |
+| iv | string | Base64 encoded iv used to encrypt the data | ✔ | ✔ |
+| cancelButtonText | string | Text to be displayed for the cancel button on biometric prompts, defaults to `Cancel` | ✖ | ✔ |
+
+__Result Object__
+
+| Property | Type | Description |
+| --- | --- | --- |
+| success | bool | A boolean indicating if the process was successful, `false` if the users cancels the biometrics prompt |
+| decrypted | string | A string representing the decrypted data. `undefined` if the process was not successful. |
+| error | string | An error message indicating reasons why signature creation failed. `undefined` if there is no error. |
+
+__Example__
+
+```js
+import ReactNativeBiometrics from 'react-native-biometrics'
+
+let payload = myStorageApi.get("encryptedPassword")
+let iv = myStorageApi.get("passwordIV")
+
+ReactNativeBiometrics.decryptData({
+    promptMessage: 'Load password',
+    payload: payload,
+    iv: iv
+  })
+  .then((resultObject) => {
+    const { success, decrypted } = resultObject
+
+    if (success) {
+      console.log(decrypted)
+      //use password to log in
     }
   })
 ```
