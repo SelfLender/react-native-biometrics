@@ -5,9 +5,13 @@ const { ReactNativeBiometrics: bridge } = NativeModules
 /**
  * Type alias for possible biometry types
  */
-export type BiometryType = 'TouchID' | 'FaceID' | 'Biometrics'
+export type BiometryType = 'TouchID' | 'FaceID' | 'Biometrics' | 'Credentials'
 
 interface RNBiometricsOptions {
+  allowDeviceCredentials?: boolean
+}
+
+interface isSensorAvailable {
   allowDeviceCredentials?: boolean
 }
 
@@ -45,6 +49,7 @@ interface SimplePromptOptions {
   promptMessage: string
   fallbackPromptMessage?: string
   cancelButtonText?: string
+  allowDeviceCredentials?: boolean
 }
 
 interface SimplePromptResult {
@@ -64,20 +69,22 @@ export const FaceID = 'FaceID'
  * Enum for generic biometrics (this is the only value available on android)
  */
 export const Biometrics = 'Biometrics'
+export const Credentials = 'Credentials'
 
 export const BiometryTypes = {
   TouchID,
   FaceID,
-  Biometrics
+  Biometrics,
+  Credentials
 }
 
 export module ReactNativeBiometricsLegacy {
   /**
-   * Returns promise that resolves to an object with object.biometryType = Biometrics | TouchID | FaceID
+   * Returns promise that resolves to an object with object.biometryType = Biometrics | TouchID | FaceID | Credentials
    * @returns {Promise<Object>} Promise that resolves to an object with details about biometrics available
    */
-  export function isSensorAvailable(): Promise<IsSensorAvailableResult> {
-    return new ReactNativeBiometrics().isSensorAvailable()
+  export function isSensorAvailable(params: isSensorAvailable): Promise<IsSensorAvailableResult> {
+    return new ReactNativeBiometrics().isSensorAvailable(params)
   }
 
   /**
@@ -127,6 +134,7 @@ export module ReactNativeBiometricsLegacy {
    * @param {Object} simplePromptOptions
    * @param {string} simplePromptOptions.promptMessage
    * @param {string} simplePromptOptions.fallbackPromptMessage
+   * @param {boolean} simplePromptOptions.allowDeviceCredentials
    * @returns {Promise<Object>}  Promise that resolves an object with details about the biometrics result
    */
   export function simplePrompt(simplePromptOptions: SimplePromptOptions): Promise<SimplePromptResult> {
@@ -150,9 +158,9 @@ export default class ReactNativeBiometrics {
      * Returns promise that resolves to an object with object.biometryType = Biometrics | TouchID | FaceID
      * @returns {Promise<Object>} Promise that resolves to an object with details about biometrics available
      */
-    isSensorAvailable(): Promise<IsSensorAvailableResult> {
+    isSensorAvailable(params?: isSensorAvailable): Promise<IsSensorAvailableResult> {
       return bridge.isSensorAvailable({
-        allowDeviceCredentials: this.allowDeviceCredentials
+        allowDeviceCredentials: params?.allowDeviceCredentials ?? this.allowDeviceCredentials
       })
     }
 
@@ -217,7 +225,7 @@ export default class ReactNativeBiometrics {
       simplePromptOptions.fallbackPromptMessage = simplePromptOptions.fallbackPromptMessage ?? 'Use Passcode'
 
       return bridge.simplePrompt({
-        allowDeviceCredentials: this.allowDeviceCredentials,
+        allowDeviceCredentials: simplePromptOptions.allowDeviceCredentials ??  this.allowDeviceCredentials,
         ...simplePromptOptions
       })
     }
