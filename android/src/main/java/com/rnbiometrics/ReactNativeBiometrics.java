@@ -1,5 +1,7 @@
 package com.rnbiometrics;
 
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
@@ -54,12 +56,27 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                 boolean allowDeviceCredentials = params.getBoolean("allowDeviceCredentials");
                 ReactApplicationContext reactApplicationContext = getReactApplicationContext();
                 BiometricManager biometricManager = BiometricManager.from(reactApplicationContext);
+                PackageManager packageManager = reactApplicationContext.getPackageManager();
                 int canAuthenticate = biometricManager.canAuthenticate(getAllowedAuthenticators(false));
 
                 if (canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS) {
                     WritableMap resultMap = new WritableNativeMap();
                     resultMap.putBoolean("available", true);
                     resultMap.putString("biometryType", "Biometrics");
+
+                    if (packageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT) == true) {
+                        resultMap.putString("biometryType", "Fingerprint");
+                    }
+                    
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        if (packageManager.hasSystemFeature(PackageManager.FEATURE_FACE) == true) {
+                            resultMap.putString("biometryType", "Face");
+                        }
+                        if (packageManager.hasSystemFeature(PackageManager.FEATURE_IRIS) == true) {
+                            resultMap.putString("biometryType", "Iris");
+                        }
+                    }
+
                     promise.resolve(resultMap);
                 } else if (allowDeviceCredentials) {
                     int canAuthenticateCredentials = biometricManager.canAuthenticate(getAllowedAuthenticators(allowDeviceCredentials));
@@ -149,6 +166,10 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
 
     private boolean isCurrentSDKMarshmallowOrLater() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
+    }
+
+    private boolean isCurrentSDKSnowConeOrLater() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.S;
     }
 
     @ReactMethod
