@@ -67,7 +67,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                     if (packageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT) == true) {
                         resultMap.putString("biometryType", "Fingerprint");
                     }
-                    
+
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                         if (packageManager.hasSystemFeature(PackageManager.FEATURE_FACE) == true) {
                             resultMap.putString("biometryType", "Face");
@@ -120,7 +120,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                             break;
                     }
 
-                    promise.resolve(resultMap); 
+                    promise.resolve(resultMap);
                 }
             } else {
                 WritableMap resultMap = new WritableNativeMap();
