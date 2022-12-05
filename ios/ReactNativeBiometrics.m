@@ -16,14 +16,10 @@ RCT_EXPORT_MODULE(ReactNativeBiometrics);
 RCT_EXPORT_METHOD(isSensorAvailable: (NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   LAContext *context = [[LAContext alloc] init];
   NSError *la_error = nil;
+  NSError *la_errorWithCredentials = nil;
   BOOL allowDeviceCredentials = [RCTConvert BOOL:params[@"allowDeviceCredentials"]];
-  LAPolicy laPolicy = LAPolicyDeviceOwnerAuthenticationWithBiometrics;
 
-  if (allowDeviceCredentials == TRUE) {
-    laPolicy = LAPolicyDeviceOwnerAuthentication;
-  }
-
-  BOOL canEvaluatePolicy = [context canEvaluatePolicy:laPolicy error:&la_error];
+  BOOL canEvaluatePolicy = [context canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&la_error];
 
   if (canEvaluatePolicy) {
     NSString *biometryType = [self getBiometryType:context];
@@ -34,13 +30,23 @@ RCT_EXPORT_METHOD(isSensorAvailable: (NSDictionary *)params resolver:(RCTPromise
 
     resolve(result);
   } else {
-    NSString *errorMessage = [NSString stringWithFormat:@"%@", la_error];
-    NSDictionary *result = @{
-      @"available": @(NO),
-      @"error": errorMessage
-    };
+    if (allowDeviceCredentials == TRUE) {
+      BOOL canEvaluatePolicy = [context canEvaluatePolicy:LAPolicyDeviceOwnerAuthentication error:&la_errorWithCredentials];
+      NSString *biometryType = [self getBiometryType:context];
+      NSDictionary *result = @{
+        @"available": @(YES),
+        @"biometryType": "Credentials"
+      };
 
-    resolve(result);
+      resolve(result);
+    } else {
+      NSString *errorMessage = [NSString stringWithFormat:@"%@", la_error];
+      NSDictionary *result = @{
+        @"available": @(NO),
+        @"error": errorMessage
+      };
+
+      resolve(result);
   }
 }
 
