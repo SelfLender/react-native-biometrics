@@ -29,16 +29,24 @@ RCT_EXPORT_METHOD(isSensorAvailable: (NSDictionary *)params resolver:(RCTPromise
     };
 
     resolve(result);
-  } else {
-    if (allowDeviceCredentials == TRUE) {
-      BOOL canEvaluatePolicy = [context canEvaluatePolicy:LAPolicyDeviceOwnerAuthentication error:&la_errorWithCredentials];
-      NSString *biometryType = [self getBiometryType:context];
-      NSDictionary *result = @{
-        @"available": @(YES),
-        @"biometryType": "Credentials"
-      };
+  } else if (allowDeviceCredentials == TRUE)  {
+      BOOL canEvaluatePolicyWithCredentials = [context canEvaluatePolicy:LAPolicyDeviceOwnerAuthentication error:&la_errorWithCredentials];
+      if(canEvaluatePolicyWithCredentials == TRUE) {
+        NSDictionary *result = @{
+          @"available": @(YES),
+          @"biometryType": @"Credentials"
+        };
 
-      resolve(result);
+        resolve(result);
+      } else {
+        NSString *errorMessage = [NSString stringWithFormat:@"%@", la_errorWithCredentials];
+        NSDictionary *result = @{
+          @"available": @(NO),
+          @"error": errorMessage
+        };
+
+        resolve(result);
+      }
     } else {
       NSString *errorMessage = [NSString stringWithFormat:@"%@", la_error];
       NSDictionary *result = @{
