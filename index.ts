@@ -6,7 +6,7 @@ const { ReactNativeBiometrics: bridge } = NativeModules
  * Type alias for possible biometry types
  */
 export type BiometryTypeIOS = 'TouchID' | 'FaceID'
-export type BiometryTypeAndroid ='Fingerprint' | 'Face' | 'Iris'| 'Biometrics' | 'Credentials'
+export type BiometryTypeAndroid ='Fingerprint' | 'Biometrics' | 'Credentials'
 export type BiometryType = BiometryTypeIOS | BiometryTypeAndroid
 
 interface RNBiometricsOptions {
@@ -70,10 +70,8 @@ export const FaceID = 'FaceID'
 /**
  * Enum for generic biometrics (this is the only value available on android)
  */
-export const Fingerprint = 'Fingerprint'
-export const Face = 'Face'
-export const Iris = 'Iris'
 export const Biometrics = 'Biometrics'
+export const Fingerprint = 'Fingerprint'
 export const Credentials = 'Credentials'
 
 export const BiometryTypes = {
@@ -81,8 +79,6 @@ export const BiometryTypes = {
   FaceID,
   Biometrics,
   Fingerprint,
-  Face,
-  Iris,
   Credentials
 }
 
