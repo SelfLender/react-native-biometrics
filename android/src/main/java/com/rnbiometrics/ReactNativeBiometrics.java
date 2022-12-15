@@ -68,7 +68,6 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                         resultMap.putString("biometryType", "Fingerprint");
                     }
 
-
                     promise.resolve(resultMap);
                 } else if (allowDeviceCredentials) {
                     int canAuthenticateCredentials = biometricManager.canAuthenticate(getAllowedAuthenticators(true));
@@ -77,40 +76,19 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                         WritableMap resultMap = new WritableNativeMap();
                         resultMap.putBoolean("available", true);
                         resultMap.putString("biometryType", "Credentials");
+                        
                         promise.resolve(resultMap);
                     } else {
                         WritableMap resultMap = new WritableNativeMap();
                         resultMap.putBoolean("available", false);
-
-                        switch (canAuthenticateCredentials) {
-                            case BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE:
-                                resultMap.putString("error", "BIOMETRIC_ERROR_NO_HARDWARE");
-                                break;
-                            case BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE:
-                                resultMap.putString("error", "BIOMETRIC_ERROR_HW_UNAVAILABLE");
-                                break;
-                            case BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED:
-                                resultMap.putString("error", "BIOMETRIC_ERROR_NONE_ENROLLED");
-                                break;
-                        }
+                        resultMap.putString("error", parseError(canAuthenticateCredentials));
 
                         promise.resolve(resultMap);
                     }
                 } else {
                     WritableMap resultMap = new WritableNativeMap();
                     resultMap.putBoolean("available", false);
-
-                    switch (canAuthenticate) {
-                        case BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE:
-                            resultMap.putString("error", "BIOMETRIC_ERROR_NO_HARDWARE");
-                            break;
-                        case BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE:
-                            resultMap.putString("error", "BIOMETRIC_ERROR_HW_UNAVAILABLE");
-                            break;
-                        case BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED:
-                            resultMap.putString("error", "BIOMETRIC_ERROR_NONE_ENROLLED");
-                            break;
-                    }
+                    resultMap.putString("error", parseError(canAuthenticate));
 
                     promise.resolve(resultMap);
                 }
@@ -121,8 +99,27 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                 promise.resolve(resultMap);
             }
         } catch (Exception e) {
-            promise.reject("Error detecting biometrics availability: " + e.getMessage(), "Error detecting biometrics availability: " + e.getMessage());
+            promise.reject("Error detecting biometrics availability: " + e.getMessage(),
+                    "Error detecting biometrics availability: " + e.getMessage());
         }
+    }
+
+    private String parseError(final int authenticationResult) {
+        String message = "";
+
+        switch (authenticationResult) {
+            case BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE:
+                message = "BIOMETRIC_ERROR_NO_HARDWARE";
+                break;
+            case BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE:
+                message = "BIOMETRIC_ERROR_HW_UNAVAILABLE";
+                break;
+            case BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED:
+                message = "BIOMETRIC_ERROR_NONE_ENROLLED";
+                break;
+        }
+
+        return message;
     }
 
     @ReactMethod
