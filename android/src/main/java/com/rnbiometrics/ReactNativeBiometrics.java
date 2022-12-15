@@ -160,10 +160,6 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
     }
 
-    private boolean isCurrentSDKSnowConeOrLater() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.S;
-    }
-
     @ReactMethod
     public void deleteKeys(Promise promise) {
         if (doesBiometricKeyExist()) {
