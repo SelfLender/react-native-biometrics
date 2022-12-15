@@ -71,7 +71,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
 
                     promise.resolve(resultMap);
                 } else if (allowDeviceCredentials) {
-                    int canAuthenticateCredentials = biometricManager.canAuthenticate(getAllowedAuthenticators(allowDeviceCredentials));
+                    int canAuthenticateCredentials = biometricManager.canAuthenticate(getAllowedAuthenticators(true));
 
                     if (canAuthenticateCredentials == BiometricManager.BIOMETRIC_SUCCESS) {
                         WritableMap resultMap = new WritableNativeMap();
