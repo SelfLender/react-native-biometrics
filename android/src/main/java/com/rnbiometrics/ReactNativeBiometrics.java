@@ -117,6 +117,9 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
             case BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED:
                 message = "BIOMETRIC_ERROR_NONE_ENROLLED";
                 break;
+            case BiometricManager.BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED:
+                message = "BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED";
+                break;
         }
 
         return message;
