@@ -92,7 +92,7 @@ export module ReactNativeBiometricsLegacy {
   /**
    * Returns promise that resolves to an object with object.keysExists = true | false
    * indicating if the keys were found to exist or not
-   * @returns {Promise<Object>} Promise that resolves to object with details aobut the existence of keys
+   * @returns {Promise<Object>} Promise that resolves to object with details about the existence of keys
    */
   export function biometricKeysExist(): Promise<BiometricKeysExistResult> {
     return new ReactNativeBiometrics().biometricKeysExist()
