@@ -1,5 +1,7 @@
 package com.rnbiometrics;
 
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
@@ -54,31 +56,39 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                 boolean allowDeviceCredentials = params.getBoolean("allowDeviceCredentials");
                 ReactApplicationContext reactApplicationContext = getReactApplicationContext();
                 BiometricManager biometricManager = BiometricManager.from(reactApplicationContext);
-                int canAuthenticate = biometricManager.canAuthenticate(getAllowedAuthenticators(allowDeviceCredentials));
+                PackageManager packageManager = reactApplicationContext.getPackageManager();
+                int canAuthenticate = biometricManager.canAuthenticate(getAllowedAuthenticators(false));
 
                 if (canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS) {
                     WritableMap resultMap = new WritableNativeMap();
                     resultMap.putBoolean("available", true);
                     resultMap.putString("biometryType", "Biometrics");
+
+                    if (packageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT) == true) {
+                        resultMap.putString("biometryType", "Fingerprint");
+                    }
+
                     promise.resolve(resultMap);
+                } else if (allowDeviceCredentials) {
+                    int canAuthenticateCredentials = biometricManager.canAuthenticate(getAllowedAuthenticators(true));
+
+                    if (canAuthenticateCredentials == BiometricManager.BIOMETRIC_SUCCESS) {
+                        WritableMap resultMap = new WritableNativeMap();
+                        resultMap.putBoolean("available", true);
+                        resultMap.putString("biometryType", "Credentials");
+                        
+                        promise.resolve(resultMap);
+                    } else {
+                        WritableMap resultMap = new WritableNativeMap();
+                        resultMap.putBoolean("available", false);
+                        resultMap.putString("error", parseError(canAuthenticateCredentials));
+
+                        promise.resolve(resultMap);
+                    }
                 } else {
                     WritableMap resultMap = new WritableNativeMap();
                     resultMap.putBoolean("available", false);
-
-                    switch (canAuthenticate) {
-                        case BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE:
-                            resultMap.putString("error", "BIOMETRIC_ERROR_NO_HARDWARE");
-                            break;
-                        case BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE:
-                            resultMap.putString("error", "BIOMETRIC_ERROR_HW_UNAVAILABLE");
-                            break;
-                        case BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED:
-                            resultMap.putString("error", "BIOMETRIC_ERROR_NONE_ENROLLED");
-                            break;
-                        case BiometricManager.BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED:
-                            resultMap.putString("error", "BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED");
-                            break; 
-                    }
+                    resultMap.putString("error", parseError(canAuthenticate));
 
                     promise.resolve(resultMap);
                 }
@@ -89,8 +99,30 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                 promise.resolve(resultMap);
             }
         } catch (Exception e) {
-            promise.reject("Error detecting biometrics availability: " + e.getMessage(), "Error detecting biometrics availability: " + e.getMessage());
+            promise.reject("Error detecting biometrics availability: " + e.getMessage(),
+                    "Error detecting biometrics availability: " + e.getMessage());
         }
+    }
+
+    private String parseError(final int authenticationResult) {
+        String message = "";
+
+        switch (authenticationResult) {
+            case BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE:
+                message = "BIOMETRIC_ERROR_NO_HARDWARE";
+                break;
+            case BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE:
+                message = "BIOMETRIC_ERROR_HW_UNAVAILABLE";
+                break;
+            case BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED:
+                message = "BIOMETRIC_ERROR_NONE_ENROLLED";
+                break;
+            case BiometricManager.BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED:
+                message = "BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED";
+                break;
+        }
+
+        return message;
     }
 
     @ReactMethod
