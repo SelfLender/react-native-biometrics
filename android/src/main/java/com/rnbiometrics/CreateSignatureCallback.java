@@ -1,24 +1,37 @@
 package com.rnbiometrics;
 
+import static com.rnbiometrics.ReactNativeBiometrics.initializeSignature;
+
 import android.util.Base64;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.biometric.BiometricPrompt;
 
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.Signature;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 
 public class CreateSignatureCallback extends BiometricPrompt.AuthenticationCallback {
     private Promise promise;
     private String payload;
+    private boolean allowDeviceCredentials;
 
-    public CreateSignatureCallback(Promise promise, String payload) {
+    public CreateSignatureCallback(Promise promise, String payload, boolean allowDeviceCredentials) {
         super();
         this.promise = promise;
         this.payload = payload;
+        this.allowDeviceCredentials = allowDeviceCredentials;
     }
 
     @Override
@@ -39,8 +52,7 @@ public class CreateSignatureCallback extends BiometricPrompt.AuthenticationCallb
         super.onAuthenticationSucceeded(result);
 
         try {
-            BiometricPrompt.CryptoObject cryptoObject = result.getCryptoObject();
-            Signature cryptoSignature = cryptoObject.getSignature();
+            Signature cryptoSignature = getSignature(result);
             cryptoSignature.update(this.payload.getBytes());
             byte[] signed = cryptoSignature.sign();
             String signedString = Base64.encodeToString(signed, Base64.DEFAULT);
@@ -53,5 +65,15 @@ public class CreateSignatureCallback extends BiometricPrompt.AuthenticationCallb
         } catch (Exception e) {
             promise.reject("Error creating signature: " + e.getMessage(), "Error creating signature");
         }
+    }
+
+    @Nullable
+    private Signature getSignature(@NonNull BiometricPrompt.AuthenticationResult result) throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException, UnrecoverableKeyException, InvalidKeyException {
+        if (this.allowDeviceCredentials) {
+            return initializeSignature();
+        }
+
+        BiometricPrompt.CryptoObject cryptoObject = result.getCryptoObject();
+        return cryptoObject.getSignature();
     }
 }
