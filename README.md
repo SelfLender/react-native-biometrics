@@ -337,6 +337,8 @@ Prompts the user for their fingerprint or face id in order to retrieve the key f
 
 **NOTE: No biometric prompt is displayed in iOS simulators when attempting to retrieve keys for signature generation, it only occurs on actual devices.**
 
+> `allowDeviceCredentials` is not supported for data encryption.
+
 __Options Object__
 
 | Parameter | Type | Description | iOS | Android |
@@ -351,7 +353,7 @@ __Result Object__
 | --- | --- | --- |
 | success | bool | A boolean indicating if the process was successful, `false` if the users cancels the biometrics prompt |
 | encrypted | string | A base64 encoded string representing the encrypted data. `undefined` if the process was not successful. |
-| iv | string | A base64 encoded string representing the AES initalisation vector. `undefined` if the process was not successful. |
+| iv | string | A base64 encoded string representing the AES initialization vector. `undefined` if the process was not successful. |
 | error | string | An error message indicating reasons why signature creation failed. `undefined` if there is no error. |
 
 __Example__
@@ -382,6 +384,8 @@ ReactNativeBiometrics.encryptData({
 Prompts the user for their fingerprint or face id in order to retrieve the key from the keystore, then uses it to decrypt the payload with the supplied IV. Returns a `Promise` that resolves to an object with the decrypted data.
 
 **NOTE: No biometric prompt is displayed in iOS simulators when attempting to retrieve keys for signature generation, it only occurs on actual devices.**
+
+> `allowDeviceCredentials` is not supported for data encryption.
 
 __Options Object__
 
