@@ -288,6 +288,26 @@ rnBiometrics.createSignature({
   })
 ```
 
+__Node.js example of server-side signature verification__
+
+```js
+const crypto = require('crypto');
+
+async function veryfySignature(publicKey, signature, payload) {
+  const cryptoKey = await crypto.subtle.importKey('spki',
+    Buffer.from(publicKey, 'base64'),
+    { name: 'RSASSA-PKCS1-v1_5', hash: "SHA256" },
+    true, ['verify']
+  );
+
+  const verify = crypto.createVerify('SHA256');
+  verify.write(payload).end();
+
+  return verify.verify(cryptoKey, Buffer.from(signature, 'base64'), 'hex');
+}
+
+```
+
 ### simplePrompt(options)
 
 Prompts the user for their fingerprint or face id. Returns a `Promise` that resolves if the user provides a valid biometrics or cancel the prompt, otherwise the promise rejects.
