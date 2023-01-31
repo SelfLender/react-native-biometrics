@@ -296,14 +296,15 @@ const crypto = require('crypto');
 async function veryfySignature(publicKey, signature, payload) {
   const cryptoKey = await crypto.subtle.importKey('spki',
     Buffer.from(publicKey, 'base64'),
-    { name: 'RSASSA-PKCS1-v1_5', hash: "SHA256" },
+    { name: 'RSASSA-PKCS1-v1_5', hash: "SHA-256" },
     true, ['verify']
   );
 
   const verify = crypto.createVerify('SHA256');
-  verify.write(payload).end();
+  verify.write(payload);
+  verify.end();
 
-  return verify.verify(cryptoKey, Buffer.from(signature, 'base64'), 'hex');
+  return verify.verify(crypto.KeyObject.from(cryptoKey), signature, 'base64')
 }
 
 ```
