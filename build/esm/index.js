@@ -1,4 +1,3 @@
-"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -10,28 +9,26 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ReactNativeBiometricsLegacy = exports.BiometryTypes = exports.Biometrics = exports.FaceID = exports.TouchID = void 0;
-var react_native_1 = require("react-native");
-var bridge = react_native_1.NativeModules.ReactNativeBiometrics;
+import { NativeModules } from 'react-native';
+var bridge = NativeModules.ReactNativeBiometrics;
 /**
  * Enum for touch id sensor type
  */
-exports.TouchID = 'TouchID';
+export var TouchID = 'TouchID';
 /**
  * Enum for face id sensor type
  */
-exports.FaceID = 'FaceID';
+export var FaceID = 'FaceID';
 /**
  * Enum for generic biometrics (this is the only value available on android)
  */
-exports.Biometrics = 'Biometrics';
-exports.BiometryTypes = {
-    TouchID: exports.TouchID,
-    FaceID: exports.FaceID,
-    Biometrics: exports.Biometrics
+export var Biometrics = 'Biometrics';
+export var BiometryTypes = {
+    TouchID: TouchID,
+    FaceID: FaceID,
+    Biometrics: Biometrics
 };
-var ReactNativeBiometricsLegacy;
+export var ReactNativeBiometricsLegacy;
 (function (ReactNativeBiometricsLegacy) {
     /**
      * Returns promise that resolves to an object with object.biometryType = Biometrics | TouchID | FaceID
@@ -103,7 +100,7 @@ var ReactNativeBiometricsLegacy;
         return new ReactNativeBiometrics().biometricKeysExistAndSignatureValid();
     }
     ReactNativeBiometricsLegacy.biometricKeysExistAndSignatureValid = biometricKeysExistAndSignatureValid;
-})(ReactNativeBiometricsLegacy = exports.ReactNativeBiometricsLegacy || (exports.ReactNativeBiometricsLegacy = {}));
+})(ReactNativeBiometricsLegacy || (ReactNativeBiometricsLegacy = {}));
 var ReactNativeBiometrics = /** @class */ (function () {
     /**
      * @param {Object} rnBiometricsOptions
@@ -189,5 +186,5 @@ var ReactNativeBiometrics = /** @class */ (function () {
     };
     return ReactNativeBiometrics;
 }());
-exports.default = ReactNativeBiometrics;
+export default ReactNativeBiometrics;
 //# sourceMappingURL=index.js.map
