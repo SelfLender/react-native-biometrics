@@ -205,6 +205,24 @@ RCT_EXPORT_METHOD(simplePrompt: (NSDictionary *)params resolver:(RCTPromiseResol
   });
 }
 
+RCT_EXPORT_METHOD(biometricKeysExistAndSignatureValid: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    BOOL biometricKeyExists = [self doesBiometricKeyExist];
+
+    if (biometricKeyExists) {
+      NSDictionary *result = @{
+        @"keysExist": @(YES)
+      };
+      resolve(result);
+    } else {
+      NSDictionary *result = @{
+        @"keysExist": @(NO)
+      };
+      resolve(result);
+    }
+  });
+}
+
 RCT_EXPORT_METHOD(biometricKeysExist: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     BOOL biometricKeyExists = [self doesBiometricKeyExist];

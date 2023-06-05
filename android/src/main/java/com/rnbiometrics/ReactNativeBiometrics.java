@@ -270,4 +270,32 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
             return false;
         }
     }
+    
+    @ReactMethod
+    public void biometricKeysExistAndSignatureValid(Promise promise) {
+        try {
+            boolean doesBiometricKeyExist = doesBiometricKeyExistAndSignatureValid();
+            WritableMap resultMap = new WritableNativeMap();
+            resultMap.putBoolean("keysExist", doesBiometricKeyExist);
+            promise.resolve(resultMap);
+        } catch (Exception e) {
+            promise.reject("Error checking if biometric key exists: " + e.getMessage(),
+                    "Error checking if biometric key exists: " + e.getMessage());
+        }
+    }
+
+    protected boolean doesBiometricKeyExistAndSignatureValid() {
+        try {
+            Signature signature = Signature.getInstance("SHA256withRSA");
+            KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+            keyStore.load(null);
+
+            PrivateKey privateKey = (PrivateKey) keyStore.getKey(biometricKeyAlias, null);
+            signature.initSign(privateKey);
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }
