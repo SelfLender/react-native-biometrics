@@ -74,6 +74,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                             break;
                         case BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED:
                             resultMap.putString("error", "BIOMETRIC_ERROR_NONE_ENROLLED");
+                            resultMap.putBoolean("available", true)
                             break;
                         case BiometricManager.BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED:
                             resultMap.putString("error", "BIOMETRIC_ERROR_SECURITY_UPDATE_REQUIRED");
