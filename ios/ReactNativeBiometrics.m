@@ -272,7 +272,7 @@ RCT_EXPORT_METHOD(encryptData: (NSDictionary *)params resolver:(RCTPromiseResolv
         NSDictionary *result = @{
             @"success": @(YES),
             @"encrypted": ciphertextString,
-            @"iv": @"", // Not needed on iOS, encoded in the cipherText blob. Returned empty for androird interoperability
+            @"iv": @"", // Not needed on iOS, encoded in the cipherText blob. Returned empty for android interoperability
         };
         resolve(result);
     });
