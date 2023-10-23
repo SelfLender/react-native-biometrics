@@ -383,7 +383,7 @@ ReactNativeBiometrics.encryptData({
 
 Prompts the user for their fingerprint or face id in order to retrieve the key from the keystore, then uses it to decrypt the payload with the supplied IV. Returns a `Promise` that resolves to an object with the decrypted data.
 
-**NOTE: No biometric prompt is displayed in iOS simulators when attempting to retrieve keys for signature generation, it only occurs on actual devices.**
+**NOTE: No biometric prompt is displayed in iOS simulators when attempting to retrieve keys for decryption, it only occurs on actual devices.**
 
 > `allowDeviceCredentials` is not supported for data encryption.
 
