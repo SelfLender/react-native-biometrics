@@ -164,6 +164,8 @@ rnBiometrics.isSensorAvailable()
 
 Generates a public private RSA 2048 key pair that will be stored in the device keystore.  Returns a `Promise` that resolves to an object providing details about the keys.
 
+⚠️ **Warning**: Subsequent calls to `createKeys()` will delete existing keys from the device keystore.
+
 __Result Object__
 
 | Property | Type | Description |
@@ -188,6 +190,8 @@ rnBiometrics.createKeys()
 ### createEncryptionKeys()
 
 Performs platform dependent setup for symmetric encryption of local-only secrets that will be stored in the device keystore (AES-GCM on Android, RSA-OAEP-SHA512-wrapped AES-GCM on iOS.) Returns a promise that resolves to the success/failure status.
+
+⚠️⚠️ **Warning**: Subsequent calls to `createEncryptionKeys()` will delete existing keys from the device keystore. As the keys are not designed to be extracted from the store, this will render all existing encrypted data inaccessible. Consider guarding calls with `biometricEncryptionKeysExist()`.
 
 __Result Object__
 
