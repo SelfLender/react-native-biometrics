@@ -185,7 +185,7 @@ rnBiometrics.createKeys()
   })
 ```
 
-### CreateEncryptionKey()
+### createEncryptionKeys()
 
 Performs platform dependent setup for symmetric encryption of local-only secrets that will be stored in the device keystore (AES-GCM on Android, RSA-OAEP-SHA512-wrapped AES-GCM on iOS.) Returns a promise that resolves to the success/failure status.
 
@@ -198,7 +198,7 @@ __Result Object__
 ```js
 import ReactNativeBiometrics from 'react-native-biometrics'
 
-ReactNativeBiometrics.createEncryptionKey('Confirm fingerprint')
+ReactNativeBiometrics.createEncryptionKeys('Confirm fingerprint')
   .then((resultObject) => {
     const { success } = resultObject
     console.log(success)
@@ -206,7 +206,7 @@ ReactNativeBiometrics.createEncryptionKey('Confirm fingerprint')
 ```
 
 
-### biometricKeysExist(), biometricEncryptionKeyExists()
+### biometricKeysExist(), biometricEncryptionKeysExist()
 
 Detects if keys have already been generated and exist in the keystore.  Returns a `Promise` that resolves to an object indicating details about the keys.
 
@@ -233,7 +233,7 @@ rnBiometrics.biometricKeysExist()
     }
   })
 
-ReactNativeBiometrics.biometricEncryptionKeyExists()
+ReactNativeBiometrics.biometricEncryptionKeysExist()
   .then((resultObject) => {
     const { keysExist } = resultObject
 
@@ -245,7 +245,7 @@ ReactNativeBiometrics.biometricEncryptionKeyExists()
   })
 ```
 
-### deleteKeys() , deleteEncryptionKey()
+### deleteKeys() , deleteEncryptionKeys()
 
 Deletes the generated key(s) from the device keystore.  Returns a `Promise` that resolves to an object indicating details about the deletion.
 
@@ -273,7 +273,7 @@ rnBiometrics.deleteKeys()
     }
   })
 
-ReactNativeBiometrics.deleteEncryptionKey()
+ReactNativeBiometrics.deleteEncryptionKeys()
   .then((resultObject) => {
     const { keysDeleted } = resultObject
 

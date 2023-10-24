@@ -99,7 +99,7 @@ RCT_EXPORT_METHOD(createKeys: (NSDictionary *)params resolver:(RCTPromiseResolve
   });
 }
 
-RCT_EXPORT_METHOD(createEncryptionKey: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_METHOD(createEncryptionKeys: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         if ([UIDevice currentDevice].systemVersion.floatValue < 11) {
             reject(@"storage_error", @"iOS 11 or higher is required to encrypt data", nil);
@@ -167,7 +167,7 @@ RCT_EXPORT_METHOD(deleteKeys: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromi
   });
 }
 
-RCT_EXPORT_METHOD(deleteEncryptionKey: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_METHOD(deleteEncryptionKeys: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSData *biometricKeyTag = [self getBiometricEncryptionKeyTag];
         BOOL success = false;
@@ -376,7 +376,7 @@ RCT_EXPORT_METHOD(biometricKeysExist: (RCTPromiseResolveBlock)resolve rejecter:(
   });
 }
 
-RCT_EXPORT_METHOD(biometricEncryptionKeyExists: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_METHOD(biometricEncryptionKeysExist: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
       NSDictionary *result = @{
           @"keysExist": @([self doesBiometricKeyExist: [self getBiometricEncryptionKeyTag]])

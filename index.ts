@@ -113,8 +113,8 @@ export module ReactNativeBiometricsLegacy {
    * Creates a symmetric encryption key, returns promise that resolves to a boolean indicating success/failure.
    * @returns {Promise<Object>}  Promise that resolves to object with success status
    */
-  export function createEncryptionKey(): Promise<SimplePromptResult> {
-    return new ReactNativeBiometrics().createEncryptionKey()
+  export function createEncryptionKeys(): Promise<SimplePromptResult> {
+    return new ReactNativeBiometrics().createEncryptionKeys()
   }
 
   /**
@@ -122,8 +122,8 @@ export module ReactNativeBiometricsLegacy {
    * indicating if the keys were found to exist or not
    * @returns {Promise<Object>} Promise that resolves to object with details aobut the existence of keys
    */
-  export function biometricEncryptionKeyExists(): Promise<BiometricKeysExistResult> {
-    return new ReactNativeBiometrics().biometricEncryptionKeyExists()
+  export function biometricEncryptionKeysExist(): Promise<BiometricKeysExistResult> {
+    return new ReactNativeBiometrics().biometricEncryptionKeysExist()
   }
 
   /**
@@ -140,8 +140,8 @@ export module ReactNativeBiometricsLegacy {
    * indicating if the encryption key properly deleted
    * @returns {Promise<Object>} Promise that resolves to an object with details about the deletion
    */
-  export function deleteEncryptionKey(): Promise<DeleteKeysResult> {
-    return new ReactNativeBiometrics().deleteEncryptionKey()
+  export function deleteEncryptionKeys(): Promise<DeleteKeysResult> {
+    return new ReactNativeBiometrics().deleteEncryptionKeys()
   }
 
   /**
@@ -245,8 +245,8 @@ export default class ReactNativeBiometrics {
    * Creates a symmetric encryption key, returns promise that resolves to a boolean indicating success/failure.
    * @returns {Promise<Object>}  Promise that resolves to object with success status
    */
-  createEncryptionKey(): Promise<SimplePromptResult> {
-    return bridge.createEncryptionKey()
+  createEncryptionKeys(): Promise<SimplePromptResult> {
+    return bridge.createEncryptionKeys()
   }
 
   /**
@@ -254,8 +254,8 @@ export default class ReactNativeBiometrics {
    * indicating if the keys were found to exist or not
    * @returns {Promise<Object>} Promise that resolves to object with details aobut the existence of keys
    */
-  biometricEncryptionKeyExists(): Promise<BiometricKeysExistResult> {
-    return bridge.biometricEncryptionKeyExists()
+  biometricEncryptionKeysExist(): Promise<BiometricKeysExistResult> {
+    return bridge.biometricEncryptionKeysExist()
   }
 
   /**
@@ -272,8 +272,8 @@ export default class ReactNativeBiometrics {
    * indicating if the encryption key properly deleted
    * @returns {Promise<Object>} Promise that resolves to an object with details about the deletion
    */
-  deleteEncryptionKey(): Promise<DeleteKeysResult> {
-    return bridge.deleteEncryptionKey()
+  deleteEncryptionKeys(): Promise<DeleteKeysResult> {
+    return bridge.deleteEncryptionKeys()
   }
 
   /**

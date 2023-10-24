@@ -136,7 +136,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void createEncryptionKey(Promise promise) {
+    public void createEncryptionKeys(Promise promise) {
         try {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                 throw new Exception("Cannot generate keys on android versions below 6.0");
@@ -183,7 +183,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void deleteEncryptionKey(Promise promise) {
+    public void deleteEncryptionKeys(Promise promise) {
         boolean deletionSuccessful = false;
         if (doesBiometricEncryptionKeyExist()) {
             deletionSuccessful = deleteBiometricEncryptionKey();
@@ -377,7 +377,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void biometricEncryptionKeyExists(Promise promise) {
+    public void biometricEncryptionKeysExist(Promise promise) {
         try {
             WritableMap resultMap = new WritableNativeMap();
             resultMap.putBoolean("keysExist", doesBiometricEncryptionKeyExist());
