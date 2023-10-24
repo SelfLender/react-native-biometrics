@@ -51,7 +51,7 @@ public class DecryptDataCallback extends BiometricPrompt.AuthenticationCallback 
             resultMap.putString("decrypted", encoded);
             promise.resolve(resultMap);
         } catch (Exception e) {
-            promise.reject("Error encrypting data: " + e.getMessage(), "Error encrypting data");
+            promise.reject("Error decrypting data: " + e.getMessage(), "Error decrypting data");
         }
     }
 }
