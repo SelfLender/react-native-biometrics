@@ -77,7 +77,7 @@ RCT_EXPORT_METHOD(createKeys: (NSDictionary *)params resolver:(RCTPromiseResolve
                                         }
                                     };
 
-    [self deleteBiometricKey];
+    [self deleteBiometricKey:biometricKeyTag];
     NSError *gen_error = nil;
     id privateKey = CFBridgingRelease(SecKeyCreateRandomKey((__bridge CFDictionaryRef)keyAttributes, (void *)&gen_error));
 
@@ -99,29 +99,91 @@ RCT_EXPORT_METHOD(createKeys: (NSDictionary *)params resolver:(RCTPromiseResolve
   });
 }
 
+RCT_EXPORT_METHOD(createEncryptionKeys: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        if ([UIDevice currentDevice].systemVersion.floatValue < 11) {
+            reject(@"storage_error", @"iOS 11 or higher is required to encrypt data", nil);
+            return;
+        }
+
+        CFErrorRef error = NULL;
+        SecAccessControlRef sacObject = SecAccessControlCreateWithFlags(kCFAllocatorDefault,
+                                                                        kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly,
+                                                                        kSecAccessControlBiometryAny|kSecAccessControlPrivateKeyUsage, &error);
+        if (sacObject == NULL || error != NULL) {
+          NSString *errorString = [NSString stringWithFormat:@"SecItemAdd can't create sacObject: %@", error];
+          reject(@"storage_error", errorString, nil);
+          return;
+        }
+
+        NSData *biometricKeyTag = [self getBiometricEncryptionKeyTag];
+        NSDictionary *keyAttributes = @{
+                                        (id)kSecAttrKeyType: (id)kSecAttrKeyTypeECSECPrimeRandom,
+                                        (id)kSecAttrKeySizeInBits: @256,
+                                        (id)kSecAttrTokenID: (id)kSecAttrTokenIDSecureEnclave,
+                                        (id)kSecPrivateKeyAttrs:
+                                          @{ (id)kSecAttrIsPermanent:    @YES,
+                                             (id)kSecAttrApplicationTag: biometricKeyTag,
+                                             (id)kSecAttrAccessControl: (__bridge_transfer id)sacObject,
+                                           },
+                                        };
+
+        [self deleteBiometricKey: biometricKeyTag];
+
+        NSError *gen_error = nil;
+        SecKeyRef privateKey = (__bridge SecKeyRef) CFBridgingRelease(SecKeyCreateRandomKey((__bridge CFDictionaryRef)keyAttributes, (void *)&gen_error));
+
+        if (privateKey == nil) {
+            NSString *message = [NSString stringWithFormat:@"Key generation error: %@", gen_error];
+            reject(@"storage_error", message, nil);
+            return;
+        }
+        SecKeyRef publicKey = SecKeyCopyPublicKey(privateKey);
+
+        NSDictionary *result = @{
+          @"success": @(YES),
+          @"pubkey": [(NSData*)CFBridgingRelease(SecKeyCopyExternalRepresentation(publicKey, nil)) base64EncodedStringWithOptions:0],
+        };
+        resolve(result);
+    });
+}
+
 RCT_EXPORT_METHOD(deleteKeys: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-    BOOL biometricKeyExists = [self doesBiometricKeyExist];
-
-    if (biometricKeyExists) {
-      OSStatus status = [self deleteBiometricKey];
-
-      if (status == noErr) {
-        NSDictionary *result = @{
-          @"keysDeleted": @(YES),
-        };
-        resolve(result);
-      } else {
-        NSString *message = [NSString stringWithFormat:@"Key not found: %@",[self keychainErrorToString:status]];
-        reject(@"deletion_error", message, nil);
+      NSData *biometricKeyTag = [self getBiometricKeyTag];
+      BOOL success = false;
+      if ([self doesBiometricKeyExist:biometricKeyTag]) {
+          OSStatus status = [self deleteBiometricKey:biometricKeyTag];
+          success = status == noErr;
+          if (!success) {
+              reject(@"deletion_error", [NSString stringWithFormat:@"Key not found: %@", [self keychainErrorToString:status]], nil);
+              return;
+          }
       }
-    } else {
+      NSDictionary *result = @{
+          @"keysDeleted": @(success),
+      };
+      resolve(result);
+  });
+}
+
+RCT_EXPORT_METHOD(deleteEncryptionKeys: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSData *biometricKeyTag = [self getBiometricEncryptionKeyTag];
+        BOOL success = false;
+        if ([self doesBiometricKeyExist:biometricKeyTag]) {
+            OSStatus status = [self deleteBiometricKey:biometricKeyTag];
+            success = status == noErr;
+            if (!success) {
+                reject(@"deletion_error", [NSString stringWithFormat:@"Key not found: %@", [self keychainErrorToString:status]], nil);
+                return;
+            }
+        }
         NSDictionary *result = @{
-          @"keysDeleted": @(NO),
+            @"keysDeleted": @(success),
         };
         resolve(result);
-    }
-  });
+    });
 }
 
 RCT_EXPORT_METHOD(createSignature: (NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
@@ -169,6 +231,106 @@ RCT_EXPORT_METHOD(createSignature: (NSDictionary *)params resolver:(RCTPromiseRe
   });
 }
 
+
+
+RCT_EXPORT_METHOD(encryptData: (NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSString *promptMessage = [RCTConvert NSString:params[@"promptMessage"]];
+        NSString *payload = [RCTConvert NSString:params[@"payload"]];
+
+        SecKeyRef privateKey;
+        OSStatus status = [self getEncryptionPrivateKey:promptMessage key:&privateKey];
+        if (status != errSecSuccess) {
+            reject(@"storage_error", [NSString stringWithFormat:@"Key not found: %@", [self keychainErrorToString:status]], nil);
+            return;
+        }
+
+        SecKeyRef publicKey = SecKeyCopyPublicKey(privateKey);
+
+        Boolean algorithmSupported = SecKeyIsAlgorithmSupported(publicKey, kSecKeyOperationTypeEncrypt, kSecKeyAlgorithmECIESEncryptionCofactorVariableIVX963SHA256AESGCM);
+
+        if (!algorithmSupported) {
+            CFRelease(privateKey);
+            CFRelease(publicKey);
+            reject(@"storage_error", @"Encryption algorithm not supported", nil);
+            return;
+        }
+
+        NSData* plainText = [payload dataUsingEncoding:NSUTF8StringEncoding];
+        NSData* cipherText = nil;
+        CFErrorRef encryptError = NULL;
+        cipherText = (NSData*)CFBridgingRelease(SecKeyCreateEncryptedData(publicKey, kSecKeyAlgorithmECIESEncryptionCofactorVariableIVX963SHA256AESGCM, (__bridge CFDataRef)plainText, &encryptError));
+        CFRelease(privateKey);
+        CFRelease(publicKey);
+
+        if (!cipherText) {
+            NSError *err = CFBridgingRelease(encryptError);
+            NSString *message = [NSString stringWithFormat:@"Encryption error: %@", err];
+            reject(@"encryption_error", message, nil);
+        }
+        NSString *ciphertextString = [cipherText base64EncodedStringWithOptions:0];
+        NSDictionary *result = @{
+            @"success": @(YES),
+            @"encrypted": ciphertextString,
+            @"iv": @"", // Not needed on iOS, encoded in the cipherText blob. Returned empty for android interoperability
+        };
+        resolve(result);
+    });
+}
+
+RCT_EXPORT_METHOD(decryptData: (NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSString *promptMessage = [RCTConvert NSString:params[@"promptMessage"]];
+        NSString *payload = [RCTConvert NSString:params[@"payload"]];
+
+        SecKeyRef privateKey;
+        OSStatus status = [self getEncryptionPrivateKey:promptMessage key:&privateKey];
+        if (status != errSecSuccess) {
+            reject(@"storage_error", [NSString stringWithFormat:@"Key not found: %@", [self keychainErrorToString:status]], nil);
+            return;
+        }
+
+        Boolean algorithmSupported = SecKeyIsAlgorithmSupported(privateKey, kSecKeyOperationTypeDecrypt, kSecKeyAlgorithmECIESEncryptionCofactorVariableIVX963SHA256AESGCM);
+
+        if (!algorithmSupported) {
+            CFRelease(privateKey);
+            reject(@"storage_error", @"Encryption algorithm not supported", nil);
+            return;
+        }
+
+        NSData *cipherText = [[NSData alloc] initWithBase64EncodedString:payload options:0];
+        if (!cipherText) {
+            reject(@"decoding_error", @"Base64 decode failed", nil);
+            return;
+        }
+        
+        NSData *plainText = nil;
+        CFErrorRef decryptError = NULL;
+        plainText = (NSData*)CFBridgingRelease(SecKeyCreateDecryptedData(privateKey, kSecKeyAlgorithmECIESEncryptionCofactorVariableIVX963SHA256AESGCM, (__bridge CFDataRef)cipherText, &decryptError));
+        CFRelease(privateKey);
+
+        if (!plainText) {
+            NSError *err = CFBridgingRelease(decryptError);
+            NSString *message = [NSString stringWithFormat:@"Decryption error: %@", err];
+            reject(@"decryption_error", message, nil);
+            return;
+        }
+
+        NSString *plaintextString = [[NSString alloc] initWithData:plainText encoding:NSUTF8StringEncoding];
+        if (!plaintextString) {
+            reject(@"encoding_error", @"UTF8 encode failed", nil);
+            return;
+        }
+        NSDictionary *result = @{
+          @"success": @(YES),
+          @"decrypted": plaintextString,
+        };
+        resolve(result);
+    });
+}
+
+
+
 RCT_EXPORT_METHOD(simplePrompt: (NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     NSString *promptMessage = [RCTConvert NSString:params[@"promptMessage"]];
@@ -207,20 +369,32 @@ RCT_EXPORT_METHOD(simplePrompt: (NSDictionary *)params resolver:(RCTPromiseResol
 
 RCT_EXPORT_METHOD(biometricKeysExist: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-    BOOL biometricKeyExists = [self doesBiometricKeyExist];
-
-    if (biometricKeyExists) {
       NSDictionary *result = @{
-        @"keysExist": @(YES)
+          @"keysExist": @([self doesBiometricKeyExist: [self getBiometricKeyTag]])
       };
       resolve(result);
-    } else {
-      NSDictionary *result = @{
-        @"keysExist": @(NO)
-      };
-      resolve(result);
-    }
   });
+}
+
+RCT_EXPORT_METHOD(biometricEncryptionKeysExist: (RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+      NSDictionary *result = @{
+          @"keysExist": @([self doesBiometricKeyExist: [self getBiometricEncryptionKeyTag]])
+      };
+      resolve(result);
+  });
+}
+
+- (OSStatus) getEncryptionPrivateKey: (NSString *) promptMessage key: (SecKeyRef *) key {
+    NSDictionary *query = @{
+                            (id)kSecClass: (id)kSecClassKey,
+                            (id)kSecAttrApplicationTag: [self getBiometricEncryptionKeyTag],
+                            (id)kSecAttrKeyType: (id)kSecAttrKeyTypeEC,
+                            (id)kSecReturnRef: @YES,
+                            (id)kSecUseOperationPrompt: promptMessage
+                            };
+    OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, (CFTypeRef *)key);
+    return status;
 }
 
 - (NSData *) getBiometricKeyTag {
@@ -229,12 +403,16 @@ RCT_EXPORT_METHOD(biometricKeysExist: (RCTPromiseResolveBlock)resolve rejecter:(
   return biometricKeyTag;
 }
 
-- (BOOL) doesBiometricKeyExist {
-  NSData *biometricKeyTag = [self getBiometricKeyTag];
+- (NSData *) getBiometricEncryptionKeyTag {
+  NSString *biometricKeyAlias = @"com.rnbiometrics.encryptionKey";
+  NSData *biometricKeyTag = [biometricKeyAlias dataUsingEncoding:NSUTF8StringEncoding];
+  return biometricKeyTag;
+}
+
+- (BOOL) doesBiometricKeyExist: (NSData *) tag {
   NSDictionary *searchQuery = @{
                                 (id)kSecClass: (id)kSecClassKey,
-                                (id)kSecAttrApplicationTag: biometricKeyTag,
-                                (id)kSecAttrKeyType: (id)kSecAttrKeyTypeRSA,
+                                (id)kSecAttrApplicationTag: tag,
                                 (id)kSecUseAuthenticationUI: (id)kSecUseAuthenticationUIFail
                                 };
 
@@ -242,12 +420,10 @@ RCT_EXPORT_METHOD(biometricKeysExist: (RCTPromiseResolveBlock)resolve rejecter:(
   return status == errSecSuccess || status == errSecInteractionNotAllowed;
 }
 
--(OSStatus) deleteBiometricKey {
-  NSData *biometricKeyTag = [self getBiometricKeyTag];
+-(OSStatus) deleteBiometricKey: (NSData *) tag {
   NSDictionary *deleteQuery = @{
                                 (id)kSecClass: (id)kSecClassKey,
-                                (id)kSecAttrApplicationTag: biometricKeyTag,
-                                (id)kSecAttrKeyType: (id)kSecAttrKeyTypeRSA
+                                (id)kSecAttrApplicationTag: tag,
                                 };
 
   OSStatus status = SecItemDelete((__bridge CFDictionaryRef)deleteQuery);

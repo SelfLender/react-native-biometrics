@@ -30,6 +30,11 @@ import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
+
 /**
  * Created by brandon on 4/5/18.
  */
@@ -37,6 +42,8 @@ import java.util.concurrent.Executors;
 public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
 
     protected String biometricKeyAlias = "biometric_key";
+    protected String biometricEncryptionKeyAlias = "biometric_encryption_key";
+    protected int encryptionKeySize = 256;
 
     public ReactNativeBiometrics(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -129,6 +136,34 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void createEncryptionKeys(Promise promise) {
+        try {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                throw new Exception("Cannot generate keys on android versions below 6.0");
+            }
+            deleteBiometricEncryptionKey();
+            KeyGenParameterSpec keyGenParameterSpec = new KeyGenParameterSpec.Builder(
+                    biometricEncryptionKeyAlias,
+                    KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT
+            )
+                    .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                    .setKeySize(encryptionKeySize)
+                    .setUserAuthenticationRequired(true)
+                    .build();
+            KeyGenerator keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
+            keyGenerator.init(keyGenParameterSpec);
+            keyGenerator.generateKey();
+
+            WritableMap resultMap = new WritableNativeMap();
+            resultMap.putBoolean("success", true); //Not returning the key itself since it's symmetric
+            promise.resolve(resultMap);
+        } catch (Exception e) {
+            ReactNativeBiometricsPackage.rejectWithThrowable(promise, "Error generating encryption key", e);
+        }
+    }
+
+    @ReactMethod
     public void deleteKeys(Promise promise) {
         if (doesBiometricKeyExist()) {
             boolean deletionSuccessful = deleteBiometricKey();
@@ -145,6 +180,99 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
             resultMap.putBoolean("keysDeleted", false);
             promise.resolve(resultMap);
         }
+    }
+
+    @ReactMethod
+    public void deleteEncryptionKeys(Promise promise) {
+        boolean deletionSuccessful = false;
+        if (doesBiometricEncryptionKeyExist()) {
+            deletionSuccessful = deleteBiometricEncryptionKey();
+            if (!deletionSuccessful) {
+                promise.reject("Error deleting biometric encryption key", "Error deleting biometric encryption key");
+            }
+        }
+        WritableMap resultMap = new WritableNativeMap();
+        resultMap.putBoolean("keysDeleted", deletionSuccessful);
+        promise.resolve(resultMap);
+    }
+
+    @ReactMethod
+    public void encryptData(final ReadableMap params, final Promise promise) {
+        UiThreadUtil.runOnUiThread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                                throw new Exception("Cannot encrypt data on android versions below 6.0");
+                            }
+                            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+                            KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+                            keyStore.load(null);
+
+                            cipher.init(Cipher.ENCRYPT_MODE, (SecretKey) keyStore.getKey(biometricEncryptionKeyAlias, null));
+
+                            BiometricPrompt biometricPrompt = new BiometricPrompt(
+                                    (FragmentActivity) getCurrentActivity(),
+                                    Executors.newSingleThreadExecutor(),
+                                    new EncryptDataCallback(promise, params.getString("payload"))
+                            );
+
+                            PromptInfo promptInfo = new PromptInfo.Builder()
+                                    .setDeviceCredentialAllowed(false)
+                                    .setNegativeButtonText(params.getString("cancelButtonText"))
+                                    .setTitle(params.getString("promptMessage"))
+                                    .build();
+                            biometricPrompt.authenticate(promptInfo, new BiometricPrompt.CryptoObject(cipher));
+                        } catch (Exception e) {
+                            ReactNativeBiometricsPackage.rejectWithThrowable(promise, "Error encrypting data", e);
+                        }
+                    }
+                }
+        );
+    }
+
+    /*
+    Decrypts a base64 encoded `payload` with the given base64 encoded `iv`, using the provided `cancelButtonText` and `promptMessage` strings on the biometric prompt
+     */
+    @ReactMethod
+    public void decryptData(final ReadableMap params, final Promise promise) {
+        UiThreadUtil.runOnUiThread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                                throw new Exception("Cannot decrypt data on android versions below 6.0");
+                            }
+                            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+                            KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+                            keyStore.load(null);
+
+                            cipher.init(
+                                    Cipher.DECRYPT_MODE,
+                                    (SecretKey) keyStore.getKey(biometricEncryptionKeyAlias, null),
+                                    new GCMParameterSpec(128, Base64.decode(params.getString("iv"), Base64.DEFAULT))
+                            );
+
+                            BiometricPrompt biometricPrompt = new BiometricPrompt(
+                                    (FragmentActivity) getCurrentActivity(),
+                                    Executors.newSingleThreadExecutor(),
+                                    new DecryptDataCallback(promise, params.getString("payload"))
+                            );
+
+                            PromptInfo promptInfo = new PromptInfo.Builder()
+                                    .setDeviceCredentialAllowed(false)
+                                    .setNegativeButtonText(params.getString("cancelButtonText"))
+                                    .setTitle(params.getString("promptMessage"))
+                                    .build();
+                            biometricPrompt.authenticate(promptInfo, new BiometricPrompt.CryptoObject(cipher));
+                        } catch (Exception e) {
+                            ReactNativeBiometricsPackage.rejectWithThrowable(promise, "Error decrypting data", e);
+                        }
+                    }
+                }
+        );
     }
 
     @ReactMethod
@@ -248,12 +376,46 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod
+    public void biometricEncryptionKeysExist(Promise promise) {
+        try {
+            WritableMap resultMap = new WritableNativeMap();
+            resultMap.putBoolean("keysExist", doesBiometricEncryptionKeyExist());
+            promise.resolve(resultMap);
+        } catch (Exception e) {
+            ReactNativeBiometricsPackage.rejectWithThrowable(promise, "Error checking for key", e);
+        }
+    }
+
+    protected boolean doesBiometricEncryptionKeyExist() {
+        try {
+            KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+            keyStore.load(null);
+
+            return keyStore.containsAlias(biometricEncryptionKeyAlias);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     protected boolean doesBiometricKeyExist() {
         try {
             KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
             keyStore.load(null);
 
             return keyStore.containsAlias(biometricKeyAlias);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    protected boolean deleteBiometricEncryptionKey() {
+        try {
+            KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+            keyStore.load(null);
+
+            keyStore.deleteEntry(biometricEncryptionKeyAlias);
+            return true;
         } catch (Exception e) {
             return false;
         }
