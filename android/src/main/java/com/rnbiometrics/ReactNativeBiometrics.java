@@ -204,7 +204,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                     public void run() {
                         try {
                             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                                throw new Exception("Cannot generate keys on android versions below 6.0");
+                                throw new Exception("Cannot encrypt data on android versions below 6.0");
                             }
                             Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
                             KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
@@ -243,7 +243,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
                     public void run() {
                         try {
                             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                                throw new Exception("Cannot generate keys on android versions below 6.0");
+                                throw new Exception("Cannot decrypt data on android versions below 6.0");
                             }
                             Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
                             KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
