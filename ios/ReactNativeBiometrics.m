@@ -82,7 +82,7 @@ RCT_EXPORT_METHOD(createKeys: (NSDictionary *)params resolver:(RCTPromiseResolve
     NSString *accessGroup = [RCTConvert NSString:params[@"accessGroup"]];
       
     if (accessGroup != nil) {
-        mAttributes[(id)kSecAttrAccessGroup] = accessGroup;
+        keyAttributesWithOptions[(id)kSecAttrAccessGroup] = accessGroup;
     }
 
     [self deleteBiometricKey];
