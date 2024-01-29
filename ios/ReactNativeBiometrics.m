@@ -77,9 +77,17 @@ RCT_EXPORT_METHOD(createKeys: (NSDictionary *)params resolver:(RCTPromiseResolve
                                         }
                                     };
 
+    NSMutableDictionary *keyAttributesWithOptions = keyAttributes.mutableCopy;
+
+    NSString *accessGroup = [RCTConvert NSString:params[@"accessGroup"]];
+      
+    if (accessGroup != nil) {
+        keyAttributesWithOptions[(id)kSecAttrAccessGroup] = accessGroup;
+    }
+
     [self deleteBiometricKey];
     NSError *gen_error = nil;
-    id privateKey = CFBridgingRelease(SecKeyCreateRandomKey((__bridge CFDictionaryRef)keyAttributes, (void *)&gen_error));
+    id privateKey = CFBridgingRelease(SecKeyCreateRandomKey((__bridge CFDictionaryRef)keyAttributesWithOptions, (void *)&gen_error));
 
     if(privateKey != nil) {
       id publicKey = CFBridgingRelease(SecKeyCopyPublicKey((SecKeyRef)privateKey));
