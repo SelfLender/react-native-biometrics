@@ -1,8 +1,8 @@
 {
-  "name": "@marianJ97/react-native-biometrics",
-  "version": "1.0.0",
-  "summary": "A fork of React Native library for biometrics",
-  "description": "A forked repository that comes from SelfLender/react-native-biometrics and includes React Native biometric functionality for signing and encryption that allows additional options when generating keys (more added later)",
+  "name": "react-native-biometrics",
+  "version": "3.0.1",
+  "summary": "A React Native library for biometrics",
+  "description": "React Native biometric functionality for signing and encryption",
   "main": "build/cjs/index.js",
   "module": "build/esm/index.js",
   "types": "build/esm/index.d.ts",
@@ -24,23 +24,23 @@
     "touch-id",
     "face-id"
   ],
-  "homepage": "https://github.com/marianJ97/react-native-biometrics",
+  "homepage": "https://github.com/SelfLender/react-native-biometrics",
   "contributors": [],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/marianJ97/react-native-biometrics.git"
+    "url": "git+https://github.com/SelfLender/react-native-biometrics.git"
   },
   "private": false,
   "author": {
-    "name": "Marian Jandacka",
-    "url": "https://https://github.com/marianJ97"
+    "name": "Brandon Hines",
+    "url": "https://github.com/NappyPirate"
   },
   "license": "MIT",
   "peerDependencies": {
     "react-native": ">=0.60.0"
   },
   "bugs": {
-    "url": "https://github.com/marianJ97/react-native-biometrics/issues"
+    "url": "https://github.com/SelfLender/react-native-biometrics/issues"
   },
   "devDependencies": {
     "typescript": "^3.7.2"
