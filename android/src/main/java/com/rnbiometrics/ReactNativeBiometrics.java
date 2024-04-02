@@ -186,7 +186,7 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
     }
 
     private PromptInfo getPromptInfo(String promptMessage, String cancelButtonText, boolean allowDeviceCredentials) {
-        PromptInfo.Builder builder = new PromptInfo.Builder().setTitle(promptMessage);
+        PromptInfo.Builder builder = new PromptInfo.Builder().setTitle(promptMessage).setConfirmationRequired(false);
 
         builder.setAllowedAuthenticators(getAllowedAuthenticators(allowDeviceCredentials));
 
@@ -199,9 +199,9 @@ public class ReactNativeBiometrics extends ReactContextBaseJavaModule {
 
     private int getAllowedAuthenticators(boolean allowDeviceCredentials) {
         if (allowDeviceCredentials && !isCurrentSDK29OrEarlier()) {
-            return BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.DEVICE_CREDENTIAL;
+            return BiometricManager.Authenticators.BIOMETRIC_WEAK | BiometricManager.Authenticators.DEVICE_CREDENTIAL;
         }
-        return BiometricManager.Authenticators.BIOMETRIC_STRONG;
+        return BiometricManager.Authenticators.BIOMETRIC_WEAK;
     }
 
     private boolean isCurrentSDK29OrEarlier() {
