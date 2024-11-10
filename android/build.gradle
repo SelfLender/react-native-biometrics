@@ -25,6 +25,7 @@ def safeExtGet(prop, fallback) {
 }
 
 android {
+    namespace "com.rnbiometrics"
     compileSdkVersion safeExtGet('compileSdkVersion', 29)
 
     defaultConfig {
