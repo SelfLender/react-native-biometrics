@@ -30,7 +30,7 @@ public class CreateSignatureCallback extends BiometricPrompt.AuthenticationCallb
             resultMap.putString("error", "User cancellation");
             this.promise.resolve(resultMap);
         } else {
-            this.promise.reject(errString.toString(), errString.toString());
+            this.promise.reject(String.valueOf(errorCode), errString.toString());
         }
     }
 

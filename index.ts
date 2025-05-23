@@ -51,6 +51,9 @@ interface SimplePromptResult {
   success: boolean
   error?: string
 }
+interface BiometricKeysExistAndSignatureValidResult {
+  keysExist: boolean
+}
 
 /**
  * Enum for touch id sensor type
@@ -131,6 +134,15 @@ export module ReactNativeBiometricsLegacy {
    */
   export function simplePrompt(simplePromptOptions: SimplePromptOptions): Promise<SimplePromptResult> {
     return new ReactNativeBiometrics().simplePrompt(simplePromptOptions)
+  }
+
+  /**
+   * Returns promise that resolves to an object with object.keysExists = true | false
+   * indicating if the keys were found to exist or not and signature valid
+   * @returns {Promise<Object>} Promise that resolves to object with details aobut the existence of keys
+   */
+   export function biometricKeysExistAndSignatureValid(): Promise<BiometricKeysExistAndSignatureValidResult> {
+    return new ReactNativeBiometrics().biometricKeysExistAndSignatureValid();
   }
 }
 
@@ -220,5 +232,14 @@ export default class ReactNativeBiometrics {
         allowDeviceCredentials: this.allowDeviceCredentials,
         ...simplePromptOptions
       })
+    }
+    
+     /**
+     * Returns promise that resolves to an object with object.keysExists = true | false
+     * indicating if the keys were found to exist or not and signature valid
+     * @returns {Promise<Object>} Promise that resolves to object with details aobut the existence of keys
+     */
+    biometricKeysExistAndSignatureValid(): Promise<BiometricKeysExistAndSignatureValidResult> {
+      return bridge.biometricKeysExistAndSignatureValid();
     }
   }
