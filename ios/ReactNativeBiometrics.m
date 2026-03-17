@@ -1,7 +1,6 @@
 //
 //  ReactNativeBiometrics.m
 //
-//  Created by Brandon Hines on 4/3/18.
 //
 
 #import "ReactNativeBiometrics.h"
@@ -49,7 +48,8 @@ RCT_EXPORT_METHOD(createKeys: (NSDictionary *)params resolver:(RCTPromiseResolve
     CFErrorRef error = NULL;
     BOOL allowDeviceCredentials = [RCTConvert BOOL:params[@"allowDeviceCredentials"]];
 
-    SecAccessControlCreateFlags secCreateFlag = kSecAccessControlBiometryAny;
+    // <-- Changed here to detect biometric changes -->
+    SecAccessControlCreateFlags secCreateFlag = kSecAccessControlBiometryCurrentSet;
 
     if (allowDeviceCredentials == TRUE) {
       secCreateFlag = kSecAccessControlUserPresence;
@@ -57,7 +57,8 @@ RCT_EXPORT_METHOD(createKeys: (NSDictionary *)params resolver:(RCTPromiseResolve
 
     SecAccessControlRef sacObject = SecAccessControlCreateWithFlags(kCFAllocatorDefault,
                                                                     kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly,
-                                                                    secCreateFlag, &error);
+                                                                    secCreateFlag,
+                                                                    &error);
     if (sacObject == NULL || error != NULL) {
       NSString *errorString = [NSString stringWithFormat:@"SecItemAdd can't create sacObject: %@", error];
       reject(@"storage_error", errorString, nil);
@@ -74,8 +75,8 @@ RCT_EXPORT_METHOD(createKeys: (NSDictionary *)params resolver:(RCTPromiseResolve
                                         (id)kSecUseAuthenticationUI: (id)kSecUseAuthenticationUIAllow,
                                         (id)kSecAttrApplicationTag: biometricKeyTag,
                                         (id)kSecAttrAccessControl: (__bridge_transfer id)sacObject
-                                        }
-                                    };
+                                    }
+                                  };
 
     [self deleteBiometricKey];
     NSError *gen_error = nil;
@@ -162,6 +163,9 @@ RCT_EXPORT_METHOD(createSignature: (NSDictionary *)params resolver:(RCTPromiseRe
         NSString *message = [NSString stringWithFormat:@"Signature error: %@", error];
         reject(@"signature_error", message, nil);
       }
+    } else if (status == errSecInteractionNotAllowed || status == errSecAuthFailed ||status == errSecItemNotFound) {
+      // <-- Detect biometric changes or key invalidation here -->
+      reject(@"biometric_changed", @"Key permanently invalidated", nil);
     } else {
       NSString *message = [NSString stringWithFormat:@"Key not found: %@",[self keychainErrorToString:status]];
       reject(@"storage_error", message, nil);
@@ -225,131 +229,104 @@ RCT_EXPORT_METHOD(biometricKeysExist: (RCTPromiseResolveBlock)resolve rejecter:(
 
 - (NSData *) getBiometricKeyTag {
   NSString *biometricKeyAlias = @"com.rnbiometrics.biometricKey";
-  NSData *biometricKeyTag = [biometricKeyAlias dataUsingEncoding:NSUTF8StringEncoding];
-  return biometricKeyTag;
+  return [biometricKeyAlias dataUsingEncoding:NSUTF8StringEncoding];
 }
 
 - (BOOL) doesBiometricKeyExist {
   NSData *biometricKeyTag = [self getBiometricKeyTag];
-  NSDictionary *searchQuery = @{
-                                (id)kSecClass: (id)kSecClassKey,
-                                (id)kSecAttrApplicationTag: biometricKeyTag,
-                                (id)kSecAttrKeyType: (id)kSecAttrKeyTypeRSA,
-                                (id)kSecUseAuthenticationUI: (id)kSecUseAuthenticationUIFail
-                                };
+  NSDictionary *query = @{
+                          (id)kSecClass: (id)kSecClassKey,
+                          (id)kSecAttrApplicationTag: biometricKeyTag,
+                          (id)kSecAttrKeyType: (id)kSecAttrKeyTypeRSA,
+                          (id)kSecReturnRef: @YES
+                          };
+  SecKeyRef privateKey;
+  OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, (CFTypeRef *)&privateKey);
 
-  OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)searchQuery, nil);
-  return status == errSecSuccess || status == errSecInteractionNotAllowed;
+  if (status == errSecSuccess) {
+    if (privateKey != NULL) {
+      CFRelease(privateKey);
+    }
+    return YES;
+  } else {
+    return NO;
+  }
 }
 
--(OSStatus) deleteBiometricKey {
+- (OSStatus) deleteBiometricKey {
   NSData *biometricKeyTag = [self getBiometricKeyTag];
-  NSDictionary *deleteQuery = @{
-                                (id)kSecClass: (id)kSecClassKey,
-                                (id)kSecAttrApplicationTag: biometricKeyTag,
-                                (id)kSecAttrKeyType: (id)kSecAttrKeyTypeRSA
-                                };
-
-  OSStatus status = SecItemDelete((__bridge CFDictionaryRef)deleteQuery);
+  NSDictionary *query = @{
+                          (id)kSecClass: (id)kSecClassKey,
+                          (id)kSecAttrApplicationTag: biometricKeyTag,
+                          (id)kSecAttrKeyType: (id)kSecAttrKeyTypeRSA
+                          };
+  OSStatus status = SecItemDelete((__bridge CFDictionaryRef)query);
   return status;
 }
 
-- (NSString *)getBiometryType:(LAContext *)context
-{
-  if (@available(iOS 11, *)) {
-    return (context.biometryType == LABiometryTypeFaceID) ? @"FaceID" : @"TouchID";
+- (NSString *) getBiometryType:(LAContext *)context {
+  if (@available(iOS 11.0, *)) {
+    switch (context.biometryType) {
+      case LABiometryTypeTouchID:
+        return @"TouchID";
+      case LABiometryTypeFaceID:
+        return @"FaceID";
+      default:
+        return @"None";
+    }
+  } else {
+    return @"TouchID";
   }
-
-  return @"TouchID";
 }
 
-- (NSString *)keychainErrorToString:(OSStatus)error {
-  NSString *message = [NSString stringWithFormat:@"%ld", (long)error];
+- (NSData *) addHeaderPublickey:(NSData *)publicKey {
+  static unsigned char rsa2048Asn1Header[] = {
+    0x30, 0x82, 0x01, 0x22, 0x30, 0x0d, 0x06, 0x09,
+    0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01,
+    0x01, 0x05, 0x00, 0x03, 0x82, 0x01, 0x0f, 0x00
+  };
 
-  switch (error) {
+  NSMutableData *encodedKey = [[NSMutableData alloc] init];
+  [encodedKey appendData:[NSData dataWithBytes:rsa2048Asn1Header length:sizeof(rsa2048Asn1Header)]];
+  [encodedKey appendData:publicKey];
+  return encodedKey;
+}
+
+- (NSString *) keychainErrorToString:(OSStatus)status {
+  NSString *message;
+  switch (status) {
     case errSecSuccess:
-      message = @"success";
+      message = @"Success";
       break;
-
+    case errSecUnimplemented:
+      message = @"Function or operation not implemented";
+      break;
+    case errSecParam:
+      message = @"One or more parameters passed to a function were not valid";
+      break;
+    case errSecAllocate:
+      message = @"Failed to allocate memory";
+      break;
+    case errSecNotAvailable:
+      message = @"No keychain is available. You may need to restart your device";
+      break;
     case errSecDuplicateItem:
-      message = @"error item already exists";
+      message = @"The item already exists";
       break;
-
-    case errSecItemNotFound :
-      message = @"error item not found";
+    case errSecItemNotFound:
+      message = @"The item cannot be found";
       break;
-
-    case errSecAuthFailed:
-      message = @"error item authentication failed";
+    case errSecInteractionNotAllowed:
+      message = @"User interaction is not allowed";
       break;
-
+    case errSecDecode:
+      message = @"Unable to decode the provided data";
+      break;
     default:
+      message = [NSString stringWithFormat:@"Unknown error (%d)", (int)status];
       break;
   }
-
   return message;
-}
-
-
-- (NSData *)addHeaderPublickey:(NSData *)publicKeyData {
-
-    unsigned char builder[15];
-    NSMutableData * encKey = [[NSMutableData alloc] init];
-    unsigned long bitstringEncLength;
-
-    static const unsigned char _encodedRSAEncryptionOID[15] = {
-
-        /* Sequence of length 0xd made up of OID followed by NULL */
-        0x30, 0x0d, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86,
-        0xf7, 0x0d, 0x01, 0x01, 0x01, 0x05, 0x00
-
-    };
-    // When we get to the bitstring - how will we encode it?
-    if  ([publicKeyData length ] + 1  < 128 )
-        bitstringEncLength = 1 ;
-    else
-        bitstringEncLength = (([publicKeyData length ] +1 ) / 256 ) + 2 ;
-    //
-    //        // Overall we have a sequence of a certain length
-    builder[0] = 0x30;    // ASN.1 encoding representing a SEQUENCE
-    //        // Build up overall size made up of -
-    //        // size of OID + size of bitstring encoding + size of actual key
-    size_t i = sizeof(_encodedRSAEncryptionOID) + 2 + bitstringEncLength + [publicKeyData length];
-    size_t j = encodeLength(&builder[1], i);
-    [encKey appendBytes:builder length:j +1];
-
-    // First part of the sequence is the OID
-    [encKey appendBytes:_encodedRSAEncryptionOID
-                 length:sizeof(_encodedRSAEncryptionOID)];
-
-    // Now add the bitstring
-    builder[0] = 0x03;
-    j = encodeLength(&builder[1], [publicKeyData length] + 1);
-    builder[j+1] = 0x00;
-    [encKey appendBytes:builder length:j + 2];
-
-    // Now the actual key
-    [encKey appendData:publicKeyData];
-
-    return encKey;
-}
-
-size_t encodeLength(unsigned char * buf, size_t length) {
-
-    // encode length in ASN.1 DER format
-    if (length < 128) {
-        buf[0] = length;
-        return 1;
-    }
-
-    size_t i = (length / 256) + 1;
-    buf[0] = i + 0x80;
-    for (size_t j = 0 ; j < i; ++j) {
-        buf[i - j] = length & 0xFF;
-        length = length >> 8;
-    }
-
-    return i + 1;
 }
 
 @end
