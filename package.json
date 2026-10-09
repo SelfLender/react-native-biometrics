@@ -6,6 +6,8 @@
   "main": "build/cjs/index.js",
   "module": "build/esm/index.js",
   "types": "build/esm/index.d.ts",
+  "react-native": "./index.ts",
+  "source": "./index.ts",
   "scripts": {
     "clean": "rm -rf build && rm -rf node_modules && npm install",
     "build": "npm run build:cjs && npm run build:esm",
