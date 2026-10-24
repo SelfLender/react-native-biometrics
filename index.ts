@@ -1,6 +1,17 @@
-import { NativeModules } from 'react-native'
+import { NativeModules, Platform } from 'react-native'
 
-const { ReactNativeBiometrics: bridge } = NativeModules
+const LINKING_ERROR =
+  "The package 'react-native-biometrics' doesn't seem to be linked. Make sure:\n\n" +
+  Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
+  '- You rebuilt the app after installing the package\n' +
+  '- You are not using Expo Go\n'
+
+// Without the native module, every call failed with "Cannot read property 'isSensorAvailable' of null"
+const bridge = NativeModules.ReactNativeBiometrics ?? new Proxy({}, {
+  get() {
+    throw new Error(LINKING_ERROR)
+  }
+})
 
 /**
  * Type alias for possible biometry types
